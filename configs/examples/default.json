@@ -1,0 +1,27 @@
+{
+  "simulation": {
+    "days": 60,
+    "blocks_per_day": 7200,
+    "tempo_blocks": 360,
+    "tao_per_block": "1.0"
+  },
+  "subnet": {
+    "initial_dtao": "1000",
+    "initial_tao": "1000",
+    "immunity_blocks": 7200,
+    "moving_alpha": "0.1",
+    "halving_time": 201600
+  },
+  "market": {
+    "other_subnets_avg_price": "2.0"
+  },
+  "strategy": {
+    "total_budget_tao": "1000",
+    "registration_cost_tao": "300",
+    "buy_threshold_price": "0.3",
+    "buy_step_size_tao": "0.5",
+    "sell_trigger_multiplier": "2.0",
+    "reserve_dtao": "5000",
+    "sell_delay_blocks": 2
+  }
+}
