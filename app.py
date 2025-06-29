@@ -23,6 +23,7 @@ import time
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from src.simulation.simulator import BittensorSubnetSimulator
+from src.strategies.tempo_sell_strategy import TempoSellStrategy
 
 # 配置页面
 st.set_page_config(
@@ -122,7 +123,7 @@ class FullWebInterface:
             "移动平均α系数",
             min_value=0.001,
             max_value=0.2,
-            value=0.1,
+            value=0.1526,
             step=0.001,
             format="%.3f",
             help="控制移动价格的收敛速度。较小值(0.001-0.05)适合稳定增长子网，较大值(0.1-0.2)适合快速增长子网"
@@ -168,8 +169,8 @@ class FullWebInterface:
             "其他子网合计移动价格", 
             min_value=0.5, 
             max_value=10.0,
-            value=2.0, 
-            step=0.5,
+            value=1.4, 
+            step=0.1,
             help="所有其他子网的dTAO移动价格总和"
         )
         
@@ -239,6 +240,25 @@ class FullWebInterface:
             help="大量卖出时保留的dTAO数量"
         )
         
+        # 新增参数
+        user_reward_share = st.sidebar.slider(
+            "我的奖励份额 (%)",
+            min_value=0.0,
+            max_value=100.0,
+            value=95.0, # 提高默认值以便观察
+            step=1.0,
+            help="您在子网中获得的dTAO总奖励的百分比。剩余部分将被视为外部参与者的奖励。"
+        )
+        
+        external_sell_pressure = st.sidebar.slider(
+            "外部卖出压力 (%)",
+            min_value=0.0,
+            max_value=100.0,
+            value=50.0, # 提高默认值以便观察
+            step=1.0,
+            help="外部参与者在获得dTAO奖励后，立即将其卖出为TAO的比例。用于模拟市场抛压。"
+        )
+        
         # 构建配置
         config = {
             "simulation": {
@@ -266,7 +286,9 @@ class FullWebInterface:
                 "sell_multiplier": "2.0",
                 "sell_trigger_multiplier": str(mass_sell_trigger_multiplier),
                 "reserve_dtao": str(reserve_dtao),
-                "sell_delay_blocks": 2
+                "sell_delay_blocks": 2,
+                "user_reward_share": str(user_reward_share),
+                "external_sell_pressure": str(external_sell_pressure)
             }
         }
         
@@ -843,7 +865,7 @@ class FullWebInterface:
                 x=tao_rates,
                 y=tao_injected,
                 name='TAO注入量',
-                text=[f"{inj:.1f}" for inj in tao_injected],
+                text=[f'{inj:.1f}' for inj in tao_injected],
                 textposition='auto',
                 marker_color=tao_rates,
                 marker_colorscale='Blues'
@@ -1012,7 +1034,7 @@ class FullWebInterface:
                 x=multipliers,
                 y=rois,
                 name='ROI',
-                text=[f"{roi:.1f}%" for roi in rois],
+                text=[f'{r:.1f}%' for r in rois],
                 textposition='auto',
                 marker_color=['red' if x <= 1.5 else 'blue' if x <= 2.5 else 'green' for x in multipliers]
             ))
@@ -1096,7 +1118,7 @@ class FullWebInterface:
             x=comparison_df['场景'],
             y=comparison_df[selected_metric],
             name=selected_metric,
-            text=comparison_df[selected_metric].round(2),
+            text=pd.to_numeric(comparison_df[selected_metric]).round(2),
             textposition='auto'
         ))
         
@@ -1243,21 +1265,24 @@ def main():
     
     with tab1:
         # 配置面板
-        config = interface.render_sidebar_config()
+        config_from_ui = interface.render_sidebar_config()
         
         # 运行模拟按钮
         col1, col2 = st.columns([3, 1])
         with col1:
             scenario_name = st.text_input("场景名称", value=f"场景-{datetime.now().strftime('%H%M%S')}")
         with col2:
-            run_button = st.button("🚀 运行模拟", type="primary")
+            # 在列的上下文中渲染按钮，并添加一个换行以改善布局
+            st.write("") 
+            run_button = st.button("🚀 运行模拟", type="primary", use_container_width=True)
         
         if run_button:
             if scenario_name in st.session_state.simulation_results:
                 st.warning(f"场景 '{scenario_name}' 已存在，将覆盖原结果")
             
             with st.spinner("正在运行模拟..."):
-                result = interface.run_simulation(config, scenario_name)
+                # 关键修正：将从UI获取的配置传递给运行函数
+                result = interface.run_simulation(config_from_ui, scenario_name)
                 
                 if result:
                     st.session_state.simulation_results[scenario_name] = result

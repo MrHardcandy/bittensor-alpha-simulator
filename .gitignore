@@ -48,3 +48,13 @@ results/
 
 # Windows
 Thumbs.db
+
+# Virtual environment
+sim_env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# nohup.out
+nohup.out

@@ -81,7 +81,7 @@ class BittensorSubnetSimulator:
             initial_dtao=Decimal(subnet_config["initial_dtao"]),
             initial_tao=Decimal(subnet_config["initial_tao"]),
             subnet_start_block=0,
-            moving_alpha=Decimal(subnet_config.get("moving_alpha", "0.125")),
+            moving_alpha=Decimal(subnet_config.get("moving_alpha", "0.1526")),
             halving_time=subnet_config.get("halving_time", 201600)
         )
         logger.info(f"AMM池初始化: {self.amm_pool}")
@@ -237,7 +237,7 @@ class BittensorSubnetSimulator:
         )
         
         # 🔧 修正：使用EmissionCalculator的TAO注入计算，应用可配置的tao_per_block参数
-        tao_injection = self.emission_calculator.calculate_block_tao_injection(
+        tao_injection_this_block = self.emission_calculator.calculate_block_tao_injection(
             emission_share=emission_share,
             current_block=block_number,
             subnet_activation_block=self.subnet_activation_block
@@ -253,29 +253,41 @@ class BittensorSubnetSimulator:
         )
         
         # 3. TAO注入（基于市场价格平衡机制，独立于dTAO产生）
-        if tao_injection > 0:
-            injection_result = self.amm_pool.inject_tao(tao_injection)
-            logger.debug(f"区块{block_number}: 市场平衡注入{tao_injection} TAO")
+        if tao_injection_this_block > 0:
+            injection_result = self.amm_pool.inject_tao(tao_injection_this_block)
+            logger.debug(f"区块{block_number}: 市场平衡注入{tao_injection_this_block} TAO")
         
         # 重要：在使用moving price进行排放计算后才更新（匹配源代码逻辑）
         self.amm_pool.update_moving_price(block_number)
         
         # 4. 处理PendingEmission排放（如果到时间）
         drain_result = comprehensive_result["drain_result"]
-        dtao_rewards = Decimal("0")
+        total_rewards_this_block = Decimal("0")
         if drain_result and drain_result["drained"]:
             # 从排放的pending emission中获得dTAO奖励
-            dtao_rewards = drain_result["pending_alpha_drained"]
-            logger.info(f"区块{block_number}: PendingEmission排放 {dtao_rewards} dTAO")
+            total_rewards_this_block = drain_result["pending_alpha_drained"]
+            logger.info(f"区块{block_number}: PendingEmission排放 {total_rewards_this_block} dTAO")
         
         # 5. 执行策略
+        # 🔧 修正：从主模拟器的config中获取UI参数
+        user_share_decimal = Decimal(self.config['strategy'].get('user_reward_share', '100')) / Decimal('100')
+        external_sell_pressure_decimal = Decimal(self.config['strategy'].get('external_sell_pressure', '0')) / Decimal('100')
+        
+        dtao_rewards_for_user = total_rewards_this_block * user_share_decimal
+        external_rewards = total_rewards_this_block * (Decimal('1') - user_share_decimal)
+
+        if external_rewards > 0 and external_sell_pressure_decimal > 0:
+            amount_to_sell = external_rewards * external_sell_pressure_decimal
+            self.amm_pool.swap_dtao_for_tao(amount_to_sell)
+            logger.debug(f"区块{block_number}: 外部卖出 {amount_to_sell} dTAO")
+
         current_price = self.amm_pool.get_spot_price()
         transactions = self.strategy.process_block(
             current_block=block_number,
             current_price=current_price,
             amm_pool=self.amm_pool,
-            dtao_rewards=dtao_rewards,
-            tao_injected=tao_injection  # 传递TAO注入量
+            dtao_rewards=dtao_rewards_for_user, # 只把用户应得的奖励传给策略
+            tao_injected=tao_injection_this_block
         )
         
         # 记录交易到数据库
@@ -294,7 +306,7 @@ class BittensorSubnetSimulator:
             "tao_reserves": float(pool_stats["tao_reserves"]),
             "spot_price": float(pool_stats["spot_price"]),
             "moving_price": float(pool_stats["moving_price"]),
-            "tao_injected": float(tao_injection),
+            "tao_injected": float(tao_injection_this_block),
             "dtao_to_pool": float(dtao_to_pool),      # 🔧 新增：记录注入到池子的dTAO
             "dtao_to_pending": float(dtao_to_pending), # 🔧 新增：记录进入待分配的dTAO
             "emission_share": float(emission_share),
@@ -303,7 +315,7 @@ class BittensorSubnetSimulator:
             "total_volume": float(pool_stats["total_volume"]),
             "pending_emission": float(comprehensive_result["pending_stats"]["pending_emission"]),
             "owner_cut_pending": float(comprehensive_result["pending_stats"]["pending_owner_cut"]),
-            "dtao_rewards_received": float(dtao_rewards),
+            "dtao_rewards_received": float(dtao_rewards_for_user),
             "timestamp": datetime.now().isoformat()
         }
         
@@ -323,7 +335,7 @@ class BittensorSubnetSimulator:
                 "to_pool": dtao_to_pool,
                 "to_pending": dtao_to_pending
             },
-            "dtao_rewards": dtao_rewards
+            "dtao_rewards": dtao_rewards_for_user
         }
     
     def _record_block_data(self, data: Dict[str, Any]):
@@ -495,4 +507,63 @@ class BittensorSubnetSimulator:
             "amm_pool_stats": self.amm_pool.get_pool_stats(),
             "strategy_stats": self.strategy.get_portfolio_stats(current_market_price=current_price),
             "emission_stats": self.emission_calculator.get_emission_stats()
-        } 
+        }
+
+    def run(self, 
+            simulation_blocks: int, 
+            user_initial_tao: Decimal, 
+            user_reward_share: Decimal,
+            external_sell_pressure: Decimal):
+        """
+        运行模拟
+        
+        Args:
+            simulation_blocks: 模拟区块数
+            user_initial_tao: 用户初始TAO投资
+            user_reward_share: 用户获得的奖励份额 (%)
+            external_sell_pressure: 外部参与者的卖出压力 (%)
+        """
+        # ... (重置状态) ...
+
+        for block_number in range(self.current_block, self.current_block + simulation_blocks):
+            # ... (原有逻辑) ...
+            
+            # 4. 在每个Tempo结束时，分配累积的dTAO奖励
+            total_reward_this_block = self.emission_calculator.add_immediate_user_reward(
+                current_block=self.current_block,
+                netuid=1 # 假设为netuid 1
+            )
+            
+            if total_reward_this_block > 0:
+                # 根据份额计算用户和外部的奖励
+                user_share_decimal = user_reward_share / Decimal("100")
+                actual_user_reward = total_reward_this_block * user_share_decimal
+                external_reward = total_reward_this_block * (Decimal("1") - user_share_decimal)
+
+                # 累积用户总奖励
+                self.total_user_rewards += actual_user_reward
+                
+                # 模拟外部卖出压力
+                if external_reward > 0 and external_sell_pressure > 0:
+                    sell_pressure_decimal = external_sell_pressure / Decimal("100")
+                    amount_to_sell = external_reward * sell_pressure_decimal
+                    if amount_to_sell > 0:
+                        self.pool.swap_dtao_for_tao(amount_to_sell)
+
+                # 清空待分配池
+                self.pending_rewards_pool = Decimal("0")
+
+            # ... (后续逻辑) ...
+
+            # 记录数据
+            # ...
+            self.history.append({
+                # ... (其他数据) ...
+                "actual_user_reward": float(actual_user_reward) if total_reward_this_block > 0 else 0,
+                "external_reward": float(external_reward) if total_reward_this_block > 0 else 0,
+                "sell_pressure_dtao": float(amount_to_sell) if total_reward_this_block > 0 and external_reward > 0 and external_sell_pressure > 0 else 0
+            })
+
+            self.current_block += 1
+
+        # ... (其他逻辑) ...

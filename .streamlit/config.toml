@@ -1,6 +1,6 @@
 [server]
 headless = true
-port = $PORT
+# port = "$PORT"
 enableCORS = false
 
 [browser]

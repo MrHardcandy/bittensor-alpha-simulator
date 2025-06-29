@@ -25,7 +25,7 @@ class AMMPool:
     """
     
     def __init__(self, initial_dtao: Decimal, initial_tao: Decimal, 
-                 subnet_start_block: int = 0, moving_alpha: Decimal = Decimal("0.125"), 
+                 subnet_start_block: int = 0, moving_alpha: Decimal = Decimal("0.1526"), 
                  halving_time: int = 201600):
         """
         初始化AMM池

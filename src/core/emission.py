@@ -486,9 +486,11 @@ class EmissionCalculator:
         )
         
         # 6. 计算owner cut和root dividends
+        # 修正：在单人模拟中，不计算root分红，因为用户拥有所有角色
+        # root_divs应为0，所有剩余alpha都应进入pending_emission
         remaining_alpha, owner_cut = self.apply_owner_cut(dynamic_emission["alpha_out"], netuid)
-        remaining_alpha, root_divs = self.calculate_root_dividends(remaining_alpha, netuid)
-        
+        root_divs = Decimal("0") # 强制root_divs为0
+
         # 7. 累积到pending
         self.accumulate_pending_emission(netuid, dynamic_emission["alpha_out"], owner_cut, root_divs)
         

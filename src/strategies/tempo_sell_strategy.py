@@ -527,48 +527,34 @@ class TempoSellStrategy:
                      dtao_rewards: Decimal = Decimal("0"),
                      tao_injected: Decimal = Decimal("0")) -> List[Dict[str, Any]]:
         """
-        处理单个区块的策略逻辑
-        
-        Args:
-            current_block: 当前区块号
-            current_price: 当前价格
-            amm_pool: AMM池实例
-            dtao_rewards: 本区块获得的dTAO奖励
-            tao_injected: 本区块注入的TAO数量
-            
-        Returns:
-            执行的交易列表
+        处理单个区块的所有策略逻辑
         """
         transactions = []
         
-        # 追踪TAO注入
-        if tao_injected > 0:
-            self.track_tao_injection(tao_injected)
+        # 1. 立即将本区块获得的dTAO奖励加入余额
+        self.add_dtao_reward_immediate(dtao_rewards, current_block)
+
+        # 2. 执行待处理的卖出队列（包括常规卖出和延续的批量卖出）
+        pending_sell_transactions = self.execute_pending_sells(current_block, current_price, amm_pool)
+        if pending_sell_transactions:
+            transactions.extend(pending_sell_transactions)
+
+        # 3. 检查并执行大量卖出（如果条件满足且未执行过）
+        if not self.mass_sell_triggered:
+            mass_sell_transaction = self.execute_mass_sell(current_block, current_price, amm_pool)
+            if mass_sell_transaction:
+                transactions.append(mass_sell_transaction)
+                self.mass_sell_triggered = True  # 确保只触发一次
+                self.phase = "regular_sell" # 转换到常规卖出阶段
         
-        # 模拟每个区块的挖矿奖励（基于TAO注入量）
-        mining_rewards = self.simulate_mining_rewards(current_block, tao_injected)
-        total_rewards = dtao_rewards + mining_rewards
+        # 4. 在积累阶段检查并执行买入
+        if self.phase == "accumulation":
+            buy_transaction = self.execute_buy(current_price, current_block, amm_pool)
+            if buy_transaction:
+                transactions.append(buy_transaction)
         
-        # 添加奖励
-        if total_rewards > 0:
-            tempo = current_block // 360
-            self.add_dtao_reward(total_rewards, current_block)
-            if mining_rewards > 0:
-                logger.debug(f"区块{current_block}: 模拟挖矿奖励 {mining_rewards} dTAO")
-        
-        # 执行待卖出
-        pending_sells = self.execute_pending_sells(current_block, current_price, amm_pool)
-        transactions.extend(pending_sells)
-        
-        # 检查大量卖出条件（传入amm_pool参数）
-        mass_sell = self.execute_mass_sell(current_block, current_price, amm_pool)
-        if mass_sell:
-            transactions.append(mass_sell)
-        
-        # 检查买入条件
-        buy_tx = self.execute_buy(current_price, current_block, amm_pool)
-        if buy_tx:
-            transactions.append(buy_tx)
+        # 5. 追踪TAO注入量（可选的分析数据）
+        self.track_tao_injection(tao_injected)
         
         return transactions
     
