@@ -100,6 +100,8 @@ class BittensorSubnetSimulator:
     def _init_strategy(self):
         """初始化交易策略"""
         strategy_config = self.config["strategy"]
+        # 修正：将豁免期参数传递给策略，以便策略可以做出正确决策
+        strategy_config['immunity_period'] = self.config["subnet"].get("immunity_blocks", 7200)
         self.strategy = TempoSellStrategy(strategy_config)
         logger.info("交易策略初始化完成")
     
@@ -257,8 +259,9 @@ class BittensorSubnetSimulator:
             injection_result = self.amm_pool.inject_tao(tao_injection_this_block)
             logger.debug(f"区块{block_number}: 市场平衡注入{tao_injection_this_block} TAO")
         
-        # 重要：在使用moving price进行排放计算后才更新（匹配源代码逻辑）
-        self.amm_pool.update_moving_price(block_number)
+        # 重要修正：只在豁免期结束后才更新移动平均价格
+        if block_number >= self.subnet_activation_block + self.emission_calculator.immunity_blocks:
+            self.amm_pool.update_moving_price(block_number)
         
         # 4. 处理PendingEmission排放（如果到时间）
         drain_result = comprehensive_result["drain_result"]

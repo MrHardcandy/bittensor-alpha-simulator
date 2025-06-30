@@ -42,6 +42,7 @@ class TempoSellStrategy:
         self.mass_sell_trigger_multiplier = Decimal(str(config.get("sell_trigger_multiplier", "2.0")))  # 重命名：大量卖出触发倍数
         self.reserve_dtao = Decimal(str(config.get("reserve_dtao", "5000")))  # 大量卖出时保留的dTAO数量
         self.sell_delay_blocks = int(config.get("sell_delay_blocks", 2))
+        self.immunity_period = int(config.get("immunity_period", 7200))
         
         # 策略状态
         self.current_tao_balance = self.available_budget
@@ -75,6 +76,10 @@ class TempoSellStrategy:
         Returns:
             是否应该买入
         """
+        # 核心战略修正：只在豁免期 (默认为7200区块) 结束后才开始买入
+        if current_block <= self.immunity_period:
+            return False
+
         # 检查策略阶段
         if self.phase != "accumulation":
             return False

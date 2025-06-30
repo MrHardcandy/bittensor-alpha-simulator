@@ -139,7 +139,7 @@ class FullWebInterface:
         • 每区块产生: {tao_rate} TAO  
         • 每日总产生: {daily_tao_production:,.0f} TAO  
         • 年度总产生: {yearly_tao_production:,.0f} TAO  
-        • 影响: 排放量、流动性、价格稳定性
+        • 影响: 子网TAO注入量、流动性
         """)
         
         # 子网参数
@@ -156,7 +156,7 @@ class FullWebInterface:
         **📖 源代码固定参数**  
         • 原始SubnetMovingAlpha: 0.000003  
         • EMAPriceHalvingBlocks: 201,600 (28天)  
-        • 免疫期: 7200区块（约1天）无TAO注入  
+        • **豁免期**: 7200区块 (约1天), **期间无TAO注入且不更新EMA价格**
         • 动态α公式: α = moving_alpha × blocks_since_start / (blocks_since_start + 201,600)
         
         💡 注意: Moving Alpha现已可调整，可根据不同子网类型优化拟合度
