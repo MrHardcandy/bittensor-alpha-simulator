@@ -214,17 +214,22 @@ class BittensorSubnetSimulator:
         """
         self.current_block = block_number
         self.current_day = block_number // self.blocks_per_day
-        tempo = block_number // self.tempo_blocks
+        current_epoch = block_number // self.tempo_blocks
         
-        # 🔧 核心修正：实现正确的dTAO产生机制
+        # 1. dTAO奖励的线性增长机制
+        # 在前100个Epoch，奖励从0线性增长到1
+        ramp_up_epochs = 100
+        ramp_up_factor = min(Decimal(str(current_epoch)) / Decimal(str(ramp_up_epochs)), Decimal("1.0"))
+        
+        # 核心修正：实现正确的dTAO产生机制
         # 每个区块（12秒）产生2个dTAO：1个进入池子，1个进入待分配
-        dtao_per_block = Decimal("2.0")  # 每区块产生2个dTAO
-        dtao_to_pool = Decimal("1.0")    # 1个进入AMM池
-        dtao_to_pending = Decimal("1.0") # 1个进入待分配
+        dtao_to_pool = Decimal("1.0")    # 注入池子的dTAO数量固定为1
+        dtao_to_pending = Decimal("1.0") * ramp_up_factor # 待分配奖励随Epoch增长
         
-        # 1. 将1个dTAO直接注入到AMM池（增加流动性）
-        pool_injection_result = self.amm_pool.inject_dtao_direct(dtao_to_pool)
-        logger.debug(f"区块{block_number}: 向AMM池注入{dtao_to_pool} dTAO，增加流动性")
+        # 2. 将1个dTAO直接注入到AMM池（增加流动性）
+        if dtao_to_pool > 0:
+            pool_injection_result = self.amm_pool.inject_dtao_direct(dtao_to_pool)
+            logger.debug(f"区块{block_number}: 向AMM池注入{dtao_to_pool} dTAO，增加流动性")
         
         # 重要：使用当前moving price计算排放份额（在更新moving price之前）
         # 这匹配源代码逻辑：先用moving price计算emission，再更新moving price
@@ -245,7 +250,7 @@ class BittensorSubnetSimulator:
             subnet_activation_block=self.subnet_activation_block
         )
         
-        # 2. 处理pending emission的dTAO分配
+        # 3. 处理pending emission的dTAO分配
         # 使用固定的dTAO进入待分配，而不是复杂的alpha计算
         comprehensive_result = self.emission_calculator.calculate_comprehensive_emission(
             netuid=1,  # 假设子网ID为1
@@ -254,7 +259,7 @@ class BittensorSubnetSimulator:
             alpha_emission_base=dtao_to_pending  # 🔧 使用实际的dTAO待分配量
         )
         
-        # 3. TAO注入（基于市场价格平衡机制，独立于dTAO产生）
+        # 4. TAO注入（基于市场价格平衡机制，独立于dTAO产生）
         if tao_injection_this_block > 0:
             injection_result = self.amm_pool.inject_tao(tao_injection_this_block)
             logger.debug(f"区块{block_number}: 市场平衡注入{tao_injection_this_block} TAO")
@@ -263,7 +268,7 @@ class BittensorSubnetSimulator:
         if block_number >= self.subnet_activation_block + self.emission_calculator.immunity_blocks:
             self.amm_pool.update_moving_price(block_number)
         
-        # 4. 处理PendingEmission排放（如果到时间）
+        # 5. 处理PendingEmission排放（如果到时间）
         drain_result = comprehensive_result["drain_result"]
         total_rewards_this_block = Decimal("0")
         if drain_result and drain_result["drained"]:
@@ -271,7 +276,7 @@ class BittensorSubnetSimulator:
             total_rewards_this_block = drain_result["pending_alpha_drained"]
             logger.info(f"区块{block_number}: PendingEmission排放 {total_rewards_this_block} dTAO")
         
-        # 5. 执行策略
+        # 6. 执行策略
         # 🔧 修正：从主模拟器的config中获取UI参数
         user_share_decimal = Decimal(self.config['strategy'].get('user_reward_share', '100')) / Decimal('100')
         external_sell_pressure_decimal = Decimal(self.config['strategy'].get('external_sell_pressure', '0')) / Decimal('100')
@@ -304,7 +309,7 @@ class BittensorSubnetSimulator:
         block_data = {
             "block_number": block_number,
             "day": self.current_day,
-            "tempo": tempo,
+            "tempo": current_epoch,
             "dtao_reserves": float(pool_stats["dtao_reserves"]),
             "tao_reserves": float(pool_stats["tao_reserves"]),
             "spot_price": float(pool_stats["spot_price"]),
@@ -334,7 +339,7 @@ class BittensorSubnetSimulator:
             "emission_share": emission_share,
             "comprehensive_emission": comprehensive_result,
             "dtao_production": {  # 🔧 新增：dTAO产生统计
-                "total_produced": dtao_per_block,
+                "total_produced": dtao_to_pool,
                 "to_pool": dtao_to_pool,
                 "to_pending": dtao_to_pending
             },
