@@ -38,7 +38,9 @@ jobs:
         with:
           name: optimization-results
           path: |
-            optimizer/optimization_results_*.json
+            optimizer/optimization_results*.json
+            optimizer/intermediate_results*.json
+            optimizer/optimization_progress*.pkl
             optimizer/optimizer.log
           retention-days: 30
 

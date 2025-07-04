@@ -18,6 +18,7 @@ from typing import Dict, List, Tuple, Any, Optional
 from multiprocessing import Pool, cpu_count
 import time
 from datetime import datetime
+import pickle
 
 # 设置高精度计算
 getcontext().prec = 50
@@ -124,7 +125,7 @@ class SimulationRunner:
         config = {
             "config_version": "2.0",
             "simulation": {
-                "days": 60,  # 60天模拟期
+                "days": 30,  # 30天模拟期
                 "blocks_per_day": 7200,
                 "tempo_blocks": 360,
                 "tao_per_block": "1.0"
@@ -332,7 +333,61 @@ class OptimizationEngine:
             max_workers: 最大并行工作进程数
         """
         self.max_workers = max_workers or min(cpu_count(), 8)  # 最多使用8个进程
+        self.timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        self.results_file = f"optimization_results_{self.timestamp}.json"
+        self.progress_file = f"optimization_progress_{self.timestamp}.pkl"
+        self.batch_results = []  # 存储当前批次结果
         logger.info(f"优化引擎初始化 - 使用 {self.max_workers} 个并行进程")
+        logger.info(f"结果将保存到: {self.results_file}")
+        logger.info(f"进度将保存到: {self.progress_file}")
+    
+    def save_batch_results(self, batch_results: List[Dict[str, Any]], batch_num: int, total_batches: int):
+        """
+        保存批次结果到磁盘
+        
+        Args:
+            batch_results: 批次结果列表
+            batch_num: 当前批次号
+            total_batches: 总批次数
+        """
+        self.batch_results.extend(batch_results)
+        
+        # 每完成一批就保存进度
+        progress_data = {
+            'completed_batches': batch_num,
+            'total_batches': total_batches,
+            'completed_combinations': len(self.batch_results),
+            'timestamp': datetime.now().isoformat(),
+            'batch_results': self.batch_results
+        }
+        
+        # 保存进度文件
+        with open(self.progress_file, 'wb') as f:
+            pickle.dump(progress_data, f)
+        
+        # 每5批或最后一批保存中间结果
+        if batch_num % 5 == 0 or batch_num == total_batches:
+            logger.info(f"💾 保存中间结果 - 批次 {batch_num}/{total_batches}")
+            intermediate_results = self._analyze_optimization_results(self.batch_results)
+            
+            # 添加进度信息
+            intermediate_results['progress'] = {
+                'completed_batches': batch_num,
+                'total_batches': total_batches,
+                'completion_percentage': (batch_num / total_batches) * 100,
+                'completed_combinations': len(self.batch_results)
+            }
+            
+            # 保存中间结果文件
+            intermediate_file = f"intermediate_results_{self.timestamp}_batch_{batch_num}.json"
+            with open(intermediate_file, 'w', encoding='utf-8') as f:
+                def decimal_converter(obj):
+                    if isinstance(obj, Decimal):
+                        return float(obj)
+                    raise TypeError
+                json.dump(intermediate_results, f, indent=2, ensure_ascii=False, default=decimal_converter)
+            
+            logger.info(f"📄 中间结果已保存: {intermediate_file}")
     
     def run_optimization(self) -> Dict[str, Any]:
         """
@@ -359,31 +414,46 @@ class OptimizationEngine:
         # 3. 并行运行模拟
         logger.info("🔄 开始并行模拟...")
         
-        # 分批处理以避免内存问题
-        batch_size = self.max_workers * 4
-        all_results = []
+        # 分批处理以避免内存问题 - 减小批次大小以更频繁保存
+        batch_size = self.max_workers * 2  # 减小批次大小
         
         for i in range(0, total_combinations, batch_size):
             batch = all_combinations[i:i + batch_size]
             batch_num = i // batch_size + 1
             total_batches = (total_combinations + batch_size - 1) // batch_size
             
-            logger.info(f"📦 处理批次 {batch_num}/{total_batches} ({len(batch)} 个组合)")
+            logger.info(f"📦 开始处理批次 {batch_num}/{total_batches} ({len(batch)} 个组合)")
+            batch_start_time = time.time()
             
             # 修正：调用顶层的 worker 函数
             with Pool(self.max_workers) as pool:
                 batch_results = pool.map(run_simulation_worker, batch)
             
-            all_results.extend(batch_results)
+            batch_end_time = time.time()
+            batch_duration = batch_end_time - batch_start_time
             
             # 显示进度
             completed = min(i + batch_size, total_combinations)
             progress = (completed / total_combinations) * 100
-            logger.info(f"📈 进度: {completed}/{total_combinations} ({progress:.1f}%)")
+            logger.info(f"📈 批次 {batch_num} 完成: {len(batch)} 个组合, 耗时 {batch_duration:.1f}秒")
+            logger.info(f"📊 总进度: {completed}/{total_combinations} ({progress:.1f}%)")
+            
+            # 立即保存批次结果
+            self.save_batch_results(batch_results, batch_num, total_batches)
+            
+            # 预估剩余时间
+            avg_time_per_batch = batch_duration
+            remaining_batches = total_batches - batch_num
+            estimated_remaining_time = remaining_batches * avg_time_per_batch
+            logger.info(f"⏱️ 预估剩余时间: {estimated_remaining_time/60:.1f} 分钟")
+            
+            # 强制垃圾回收，释放内存
+            import gc
+            gc.collect()
         
         # 4. 分析和排序结果
-        logger.info("📊 分析优化结果...")
-        optimization_results = self._analyze_optimization_results(all_results)
+        logger.info("📊 分析最终优化结果...")
+        optimization_results = self._analyze_optimization_results(self.batch_results)
         
         # 5. 生成报告
         elapsed_time = time.time() - start_time
@@ -391,11 +461,12 @@ class OptimizationEngine:
         
         optimization_results['meta'] = {
             'total_combinations': total_combinations,
-            'successful_simulations': len([r for r in all_results if r['success']]),
-            'failed_simulations': len([r for r in all_results if not r['success']]),
+            'successful_simulations': len([r for r in self.batch_results if r['success']]),
+            'failed_simulations': len([r for r in self.batch_results if not r['success']]),
             'elapsed_time_seconds': elapsed_time,
             'max_workers': self.max_workers,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat(),
+            'simulation_days': 30  # 记录模拟天数
         }
         
         return optimization_results
@@ -564,8 +635,8 @@ def main():
         # 运行优化
         results = optimizer.run_optimization()
         
-        # 保存结果到文件
-        output_file = f"optimization_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        # 保存最终结果到文件
+        output_file = optimizer.results_file
         with open(output_file, 'w', encoding='utf-8') as f:
             # 转换Decimal为字符串以便JSON序列化
             def decimal_converter(obj):
@@ -575,7 +646,13 @@ def main():
             
             json.dump(results, f, indent=2, ensure_ascii=False, default=decimal_converter)
         
-        logger.info(f"📄 结果已保存到: {output_file}")
+        logger.info(f"📄 最终结果已保存到: {output_file}")
+        
+        # 也创建一个通用名称的副本供GitHub Actions使用
+        final_copy = "optimization_results.json"
+        with open(final_copy, 'w', encoding='utf-8') as f:
+            json.dump(results, f, indent=2, ensure_ascii=False, default=decimal_converter)
+        logger.info(f"📄 副本已保存到: {final_copy}")
         
         # 打印报告
         print_optimization_report(results)
