@@ -750,7 +750,6 @@ def download_and_unzip_artifact(url, github_token):
     return None
 
 def main():
-    st.set_page_config(layout="wide")
     st.title("🧠 Bittensor 策略优化结果展示面板")
     
     # 从 Streamlit Secrets 获取 GitHub Token

@@ -130,8 +130,8 @@ class SimulationRunner:
                 "tao_per_block": "1.0"
             },
             "subnet": {
-                "initial_dtao": "10000",
-                "initial_tao": "10000",
+                "initial_dtao": "1",
+                "initial_tao": "1",
                 "immunity_blocks": 7200,
                 "moving_alpha": "0.1526",
                 "halving_time": 201600
