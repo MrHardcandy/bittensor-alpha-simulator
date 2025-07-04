@@ -190,10 +190,114 @@ class SimulationRunner:
 def analyze_simulation_result_worker(results: Dict[str, Any], params: Dict[str, Any]) -> Dict[str, Any]:
     """
     一个独立的 worker 函数，用于分析单次模拟的结果。
+    
+    Args:
+        results: 模拟器返回的结果字典
+        params: 模拟参数
+        
+    Returns:
+        分析结果字典，包含回本情况、ROI等关键指标
     """
-    # ... (这里是 ResultAnalyzer.analyze_simulation_result 的全部逻辑) ...
-    # ... (省略了具体实现，因为它很长)
-    pass # 占位符
+    try:
+        if not results or 'summary' not in results:
+            return {
+                'payback_achieved': False,
+                'payback_time_days': float('inf'),
+                'total_return_tao': 0,
+                'final_roi': 0,
+                'total_investment': 0,
+                'total_asset_value': 0,
+                'error': 'No valid results'
+            }
+        
+        summary = results['summary']
+        strategy_summary = summary.get('strategy_summary', {})
+        final_stats = summary.get('final_pool_state', {})
+        key_metrics = summary.get('key_metrics', {})
+        
+        # 计算实际总投资 (包括注册费)
+        registration_cost = 100  # 固定的注册费
+        initial_budget = params['total_budget_tao']
+        second_buy_amount = params['second_buy_tao_amount']
+        total_investment = initial_budget + second_buy_amount
+        
+        # 获取最终资产价值
+        final_tao_balance = float(strategy_summary.get('final_tao_balance', 0))
+        final_dtao_balance = float(strategy_summary.get('final_dtao_balance', 0))
+        final_price = float(final_stats.get('final_price', 0))
+        
+        # 计算总资产价值 (TAO + DTAO转换为TAO)
+        total_asset_value = final_tao_balance + (final_dtao_balance * final_price)
+        
+        # 计算净收益
+        net_profit = total_asset_value - total_investment
+        
+        # 计算是否回本
+        payback_achieved = total_asset_value >= total_investment
+        
+        # 计算回本时间
+        payback_time_days = float('inf')
+        if payback_achieved and 'daily_portfolio_values' in results:
+            daily_values = results['daily_portfolio_values']
+            for day, value in enumerate(daily_values):
+                if float(value) >= total_investment:
+                    payback_time_days = day + 1
+                    break
+        elif payback_achieved:
+            # 如果没有详细的每日数据，使用估算方法
+            simulation_days = params.get('simulation_days', 60)
+            if total_asset_value > 0:
+                # 假设线性增长的简化估算
+                growth_rate = (total_asset_value - total_investment) / total_investment
+                if growth_rate > 0:
+                    payback_time_days = simulation_days * (1 / (1 + growth_rate))
+        
+        # 计算总回报和ROI
+        total_return_tao = max(0, net_profit)
+        final_roi = (net_profit / total_investment * 100) if total_investment > 0 else 0
+        
+        # 获取额外的策略指标
+        total_tao_bought = float(strategy_summary.get('total_tao_bought', 0))
+        total_tao_sold = float(strategy_summary.get('total_tao_sold', 0))
+        total_dtao_bought = float(strategy_summary.get('total_dtao_bought', 0))
+        total_dtao_sold = float(strategy_summary.get('total_dtao_sold', 0))
+        
+        # 计算交易效率指标
+        trade_efficiency = 0
+        if total_tao_bought > 0:
+            trade_efficiency = (total_tao_sold / total_tao_bought) * 100
+        
+        return {
+            'payback_achieved': payback_achieved,
+            'payback_time_days': payback_time_days,
+            'total_return_tao': total_return_tao,
+            'final_roi': final_roi,
+            'total_investment': total_investment,
+            'total_asset_value': total_asset_value,
+            'net_profit': net_profit,
+            'final_tao_balance': final_tao_balance,
+            'final_dtao_balance': final_dtao_balance,
+            'final_price': final_price,
+            'total_tao_bought': total_tao_bought,
+            'total_tao_sold': total_tao_sold,
+            'total_dtao_bought': total_dtao_bought,
+            'total_dtao_sold': total_dtao_sold,
+            'trade_efficiency': trade_efficiency,
+            'success': True
+        }
+        
+    except Exception as e:
+        logger.error(f"分析结果时发生错误: {str(e)}")
+        return {
+            'payback_achieved': False,
+            'payback_time_days': float('inf'),
+            'total_return_tao': 0,
+            'final_roi': 0,
+            'total_investment': 0,
+            'total_asset_value': 0,
+            'error': f'Analysis failed: {str(e)}',
+            'success': False
+        }
 
 def run_simulation_worker(params: Dict[str, Any]) -> Dict[str, Any]:
     """
