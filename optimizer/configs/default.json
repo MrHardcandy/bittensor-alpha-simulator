@@ -1,0 +1,26 @@
+{
+  "config_version": "2.0",
+  "simulation": {
+    "days": 180,
+    "blocks_per_day": 7200,
+    "tempo_blocks": 360,
+    "tao_per_block": "1.0"
+  },
+  "market": {
+    "other_subnets_avg_price": "1.4"
+  },
+  "subnet": {
+    "initial_dtao": "1000000.0",
+    "initial_tao": "100000.0",
+    "immunity_blocks": 7200,
+    "moving_alpha": "0.1526"
+  },
+  "strategy": {
+    "name": "TempoSellStrategy",
+    "params": {
+      "initial_investment_tao": "1000",
+      "sell_trigger_multiple": "2.0",
+      "buy_threshold": "0.01"
+    }
+  }
+} 
