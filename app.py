@@ -18,6 +18,8 @@ from datetime import datetime
 from decimal import Decimal
 import logging
 import time
+import requests
+import io
 
 # 添加项目路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -719,32 +721,63 @@ class FullWebInterface:
             final_phase_name = "未知"
         col4.metric("最终策略阶段", final_phase_name)
 
+def get_latest_artifact_url(github_token):
+    """从GitHub API获取最新的构建产物URL"""
+    repo = "MrHardcandy/bittensor-alpha-simulator"
+    api_url = f"https://api.github.com/repos/{repo}/actions/artifacts"
+    headers = {"Authorization": f"token {github_token}"}
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        artifacts = response.json().get('artifacts', [])
+        if artifacts:
+            # 找到名为 'optimization-results' 的最新产物
+            opt_artifacts = [a for a in artifacts if a['name'] == 'optimization-results']
+            if opt_artifacts:
+                latest_artifact = sorted(opt_artifacts, key=lambda x: x['created_at'], reverse=True)[0]
+                return latest_artifact['archive_download_url']
+    return None
+
+def download_and_unzip_artifact(url, github_token):
+    """下载并解压构建产物"""
+    headers = {"Authorization": f"token {github_token}"}
+    response = requests.get(url, headers=headers, stream=True)
+    if response.status_code == 200:
+        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+            # 假设压缩包里只有一个文件
+            filename = z.namelist()[0] 
+            with z.open(filename) as f:
+                return json.load(f)
+    return None
+
 def main():
-    """主函数"""
-    interface = FullWebInterface()
+    st.set_page_config(layout="wide")
+    st.title("🧠 Bittensor 策略优化结果展示面板")
     
-    # 渲染头部
-    interface.render_header()
+    # 从 Streamlit Secrets 获取 GitHub Token
+    github_token = st.secrets.get("GITHUB_TOKEN")
 
-    with st.sidebar:
-        st.header("⚙️ 参数调节面板")
-        # ... (所有滑块和输入框的代码) ...
-        config_and_button = interface.render_sidebar_config()
-        config_from_ui = config_and_button['config']
-        run_button = config_and_button['run_button']
+    if not github_token:
+        st.error("错误：请在 Streamlit Cloud 的 Secrets 中设置 GITHUB_TOKEN。")
+        return
 
-    if 'simulation_results' not in st.session_state:
-        st.session_state.simulation_results = None
+    st.info("正在从 GitHub Actions 获取最新的优化结果...")
 
-    if run_button:
-        # ... (运行单次模拟的逻辑) ...
-        st.session_state.simulation_results = results
-        st.session_state.final_stats = final_stats
-    
-    if st.session_state.simulation_results:
-        # ... (显示结果的逻辑) ...
+    artifact_url = get_latest_artifact_url(github_token)
+
+    if artifact_url:
+        results_data = download_and_unzip_artifact(artifact_url, github_token)
+        if results_data:
+            st.success("✅ 成功加载最新的优化结果！")
+            
+            # 在这里调用你已经写好的结果展示函数
+            # e.g., interface.render_optimization_report(results_data)
+            
+            st.subheader("原始 JSON 结果")
+            st.json(results_data)
+        else:
+            st.warning("无法下载或解析结果文件。请检查 GitHub Actions 的运行状态。")
     else:
-        st.info("👈 请在左侧调整参数，然后点击"运行单次模拟"按钮。")
+        st.warning("未找到任何名为 'optimization-results' 的构建产物。请确保 GitHub Actions 已成功运行一次。")
 
 if __name__ == "__main__":
     main() 
