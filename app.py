@@ -23,7 +23,7 @@ import time
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from src.simulation.simulator import BittensorSubnetSimulator
-from src.strategies.tempo_sell_strategy import TempoSellStrategy
+from src.strategies.tempo_sell_strategy import TempoSellStrategy, StrategyPhase
 
 # 配置页面
 st.set_page_config(
@@ -186,11 +186,13 @@ class FullWebInterface:
         )
         
         registration_cost = st.sidebar.number_input(
-            "注册成本（TAO）", 
-            value=300.0, 
+            "子网注册成本 (TAO)",
+            value=100.0,
             min_value=0.0,
             max_value=1000.0,
-            step=50.0
+            step=10.0,
+            format="%.2f",
+            help="创建您自己子网的一次性销毁成本。"
         )
         
         buy_threshold = st.sidebar.slider(
@@ -218,7 +220,7 @@ class FullWebInterface:
             "触发倍数",
             min_value=1.2,
             max_value=5.0,
-            value=2.0,
+            value=3.0,  # 🔧 修改默认值为3倍
             step=0.1,
             help="当AMM池TAO储备达到初始储备的指定倍数时触发大量卖出"
         )
@@ -245,9 +247,10 @@ class FullWebInterface:
             "我的奖励份额 (%)",
             min_value=0.0,
             max_value=100.0,
-            value=95.0, # 提高默认值以便观察
+            value=59.0,
             step=1.0,
-            help="您在子网中获得的dTAO总奖励的百分比。剩余部分将被视为外部参与者的奖励。"
+            format="%.1f%%",
+            help="模拟您能获得子网dTAO总奖励的百分比。剩余部分将被视为外部参与者的奖励。"
         )
         
         external_sell_pressure = st.sidebar.slider(
@@ -258,6 +261,40 @@ class FullWebInterface:
             step=1.0,
             help="外部参与者在获得dTAO奖励后，立即将其卖出为TAO的比例。用于模拟市场抛压。"
         )
+        
+        # 二次增持策略配置
+        st.sidebar.subheader("🔄 二次增持策略")
+        
+        enable_second_buy = st.sidebar.checkbox(
+            "启用二次增持",
+            value=False,
+            help="勾选启用二次增持功能，可在指定时间后追加投资"
+        )
+        
+        # 只有启用时才显示配置参数
+        if enable_second_buy:
+            second_buy_delay_days = st.sidebar.number_input(
+                "延迟天数",
+                min_value=0,
+                max_value=360,
+                value=1,  # 🔧 修改默认值为1天
+                step=1,
+                help="从首次买入后延迟多少天进行二次增持。设为0表示在免疫期结束后立即执行。"
+            )
+
+            second_buy_tao_amount = st.sidebar.number_input(
+                "增持金额 (TAO)",
+                min_value=100.0,
+                max_value=10000.0,
+                value=4000.0,  # 🔧 修改默认值为4000 TAO
+                step=100.0,
+                help="第二次投入的TAO数量"
+            )
+        else:
+            second_buy_delay_days = 0
+            second_buy_tao_amount = 0.0
+
+        run_button = st.sidebar.button("🚀 运行模拟", use_container_width=True, type="primary")
         
         # 构建配置
         config = {
@@ -288,11 +325,16 @@ class FullWebInterface:
                 "reserve_dtao": str(reserve_dtao),
                 "sell_delay_blocks": 2,
                 "user_reward_share": str(user_reward_share),
-                "external_sell_pressure": str(external_sell_pressure)
+                "external_sell_pressure": str(external_sell_pressure),
+                "second_buy_delay_blocks": second_buy_delay_days * 7200,
+                "second_buy_tao_amount": str(second_buy_tao_amount)
             }
         }
         
-        return config
+        return {
+            'config': config,
+            'run_button': run_button
+        }
     
     def create_price_chart(self, data: pd.DataFrame) -> go.Figure:
         """创建价格走势图"""
@@ -323,9 +365,13 @@ class FullWebInterface:
         # 🔧 修正：计算ROI，使用当前市场价格计算总资产价值
         total_value = (data['strategy_tao_balance'] + 
                       data['strategy_dtao_balance'] * data['spot_price'])  # 使用spot_price
-        # 🔧 修正：获取实际的初始投资金额
-        initial_investment = float(data.iloc[0]['strategy_tao_balance']) + 300  # TAO余额 + 注册成本
-        roi_values = (total_value / initial_investment - 1) * 100
+        # 🔧 修正：获取实际的总投资金额（包括二次增持）
+        # 注意：这里需要从配置中获取实际的总投资，而不是从余额推算
+        # 暂时使用传统方法，但会在后续优化中改进
+        first_row_balance = float(data.iloc[0]['strategy_tao_balance'])
+        registration_cost = 100  # 新的默认注册成本
+        # 这里需要从策略配置中获取二次增持金额，暂时先使用估算
+        roi_values = (total_value / first_row_balance - 1) * 100
         
         fig.add_trace(go.Scatter(
             x=data['day'],
@@ -622,6 +668,10 @@ class FullWebInterface:
         
         budget = float(result['config']['strategy']['total_budget_tao'])
         registration_cost = float(result['config']['strategy']['registration_cost_tao'])
+        second_buy_amount = float(result['config']['strategy']['second_buy_tao_amount'])
+        
+        # 🔧 修正：计算实际总投资
+        actual_total_investment = budget + second_buy_amount
         
         analysis_col1, analysis_col2 = st.columns(2)
         
@@ -636,15 +686,37 @@ class FullWebInterface:
             """)
         
         with analysis_col2:
-            net_profit = total_asset_value - budget
-            roi_percentage = (net_profit/budget)*100 if budget > 0 else 0
+            # 🔧 修正：基于实际总投资计算收益
+            net_profit = total_asset_value - actual_total_investment
+            roi_percentage = (net_profit/actual_total_investment)*100 if actual_total_investment > 0 else 0
             st.success(f"""
             **💰 收益分析**
-            - 初始投资: {budget:.2f} TAO
+            - 初始预算: {budget:.2f} TAO
+            - 二次增持: {second_buy_amount:.2f} TAO
+            - 总投资: {actual_total_investment:.2f} TAO
             - 注册成本: {registration_cost:.2f} TAO
             - 净收益: {net_profit:.2f} TAO
             - ROI: {roi_percentage:.2f}%
             """)
+        
+        # --- Key Metrics ---
+        st.subheader("核心指标")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("最终总资产 (TAO)", f"{summary['key_metrics']['final_asset_value']:.2f}")
+        col2.metric("净回报率 (ROI)", f"{summary['key_metrics']['total_roi']:.2%}")
+        col3.metric("最终dTAO价格 (TAO)", f"{summary['final_pool_state']['final_price']:.6f}")
+        # 新增指标卡 - 修复策略阶段显示
+        try:
+            final_phase_value = summary['strategy_performance']['strategy_phase']
+            if isinstance(final_phase_value, int):
+                final_phase_name = StrategyPhase(final_phase_value).name
+            elif hasattr(final_phase_value, 'name'):
+                final_phase_name = final_phase_value.name
+            else:
+                final_phase_name = str(final_phase_value)
+        except (KeyError, ValueError):
+            final_phase_name = "未知"
+        col4.metric("最终策略阶段", final_phase_name)
     
     def render_comparison_tools(self):
         """渲染多策略对比工具"""
@@ -1264,17 +1336,13 @@ def main():
     tab1, tab2, tab3 = st.tabs(["🎯 单场景模拟", "🔄 多策略对比", "📊 结果管理"])
     
     with tab1:
-        # 配置面板
-        config_from_ui = interface.render_sidebar_config()
+        # 配置面板（包含运行按钮）
+        config_and_button = interface.render_sidebar_config()
+        config_from_ui = config_and_button['config']
+        run_button = config_and_button['run_button']
         
-        # 运行模拟按钮
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            scenario_name = st.text_input("场景名称", value=f"场景-{datetime.now().strftime('%H%M%S')}")
-        with col2:
-            # 在列的上下文中渲染按钮，并添加一个换行以改善布局
-            st.write("") 
-            run_button = st.button("🚀 运行模拟", type="primary", use_container_width=True)
+        # 场景名称输入
+        scenario_name = st.text_input("场景名称", value=f"场景-{datetime.now().strftime('%H%M%S')}")
         
         if run_button:
             if scenario_name in st.session_state.simulation_results:

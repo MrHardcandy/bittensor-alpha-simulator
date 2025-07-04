@@ -5,16 +5,21 @@ Tempo卖出策略 - 基于价格阈值的买入卖出策略
 from decimal import Decimal, getcontext
 from typing import Dict, Any, Optional, List
 import logging
+from enum import Enum, auto
 
 # 设置高精度计算
 getcontext().prec = 50
 
 logger = logging.getLogger(__name__)
 
+class StrategyPhase(Enum):
+    ACCUMULATION = auto()
+    MASS_SELL = auto()
+    REGULAR_SELL = auto()
 
 class TempoSellStrategy:
     """
-    Tempo卖出策略实现
+    Tempo卖出策略实现 (新增二次增持功能)
     
     策略逻辑：
     1. 当dTAO价格低于买入阈值时，按步长买入
@@ -32,15 +37,22 @@ class TempoSellStrategy:
         # 基础配置
         self.total_budget = Decimal(str(config.get("total_budget_tao", "1000")))
         self.registration_cost = Decimal(str(config.get("registration_cost_tao", "300")))
-        self.available_budget = self.total_budget - self.registration_cost
+        
+        # 二次增持参数 (需要在计算可用预算前确定)
+        self.second_buy_delay_blocks = int(config.get("second_buy_delay_blocks", 7200 * 30)) # 默认30天后
+        self.second_buy_tao_amount = Decimal(str(config.get("second_buy_tao_amount", "0"))) # 默认不进行二次增持
+        
+        # 🔧 修正：总可用资金 = 初始预算 + 二次增持预算 - 注册成本
+        total_planned_budget = self.total_budget + self.second_buy_tao_amount
+        self.available_budget = total_planned_budget - self.registration_cost
         
         # 买入配置
         self.buy_threshold_price = Decimal(str(config.get("buy_threshold_price", "0.3")))
         self.buy_step_size = Decimal(str(config.get("buy_step_size_tao", "0.5")))
         
-        # 卖出配置 - 删除重复的sell_multiplier，只保留大量卖出触发倍数
-        self.mass_sell_trigger_multiplier = Decimal(str(config.get("sell_trigger_multiplier", "2.0")))  # 重命名：大量卖出触发倍数
-        self.reserve_dtao = Decimal(str(config.get("reserve_dtao", "5000")))  # 大量卖出时保留的dTAO数量
+        # 卖出配置
+        self.mass_sell_trigger_multiplier = Decimal(str(config.get("sell_trigger_multiplier", "2.0")))
+        self.reserve_dtao = Decimal(str(config.get("reserve_dtao", "5000")))
         self.sell_delay_blocks = int(config.get("sell_delay_blocks", 2))
         self.immunity_period = int(config.get("immunity_period", 7200))
         
@@ -60,10 +72,25 @@ class TempoSellStrategy:
         self.pending_sells = {}  # {block: dtao_amount}
         
         # 策略阶段
-        self.phase = "accumulation"  # accumulation, mass_sell, regular_sell
+        self.phase = StrategyPhase.ACCUMULATION  # 使用枚举
         self.mass_sell_triggered = False
         
-        logger.info(f"Tempo卖出策略初始化: 预算={self.total_budget}, 买入阈值={self.buy_threshold_price}, 触发条件={self.total_budget * self.mass_sell_trigger_multiplier}TAO, 保留dTAO={self.reserve_dtao}")
+        # 新增：用于追踪总投入
+        self.total_tao_invested = Decimal("0")
+        self.second_buy_done = False # 新增：二次增持完成标志
+        
+        # 🔧 更新日志信息，显示完整的预算和触发条件
+        total_planned_investment = self.total_budget + self.second_buy_tao_amount
+        trigger_condition = total_planned_investment * self.mass_sell_trigger_multiplier
+        
+        logger.info(f"Tempo卖出策略初始化:")
+        logger.info(f"  - 初始预算: {self.total_budget} TAO")
+        logger.info(f"  - 二次增持: {self.second_buy_tao_amount} TAO (延迟: {self.second_buy_delay_blocks//7200}天)")
+        logger.info(f"  - 总计划投入: {total_planned_investment} TAO")
+        logger.info(f"  - 买入阈值: {self.buy_threshold_price}")
+        logger.info(f"  - 买入步长: {self.buy_step_size} TAO")
+        logger.info(f"  - 大量卖出触发: {trigger_condition} TAO (倍数: {self.mass_sell_trigger_multiplier})")
+        logger.info(f"  - 保留dTAO: {self.reserve_dtao}")
     
     def should_buy(self, current_price: Decimal, current_block: int) -> bool:
         """
@@ -81,7 +108,7 @@ class TempoSellStrategy:
             return False
 
         # 检查策略阶段
-        if self.phase != "accumulation":
+        if self.phase != StrategyPhase.ACCUMULATION:
             return False
         
         # 检查价格条件
@@ -139,6 +166,10 @@ class TempoSellStrategy:
             self.transaction_log.append(transaction)
             
             logger.info(f"买入执行: 花费{tao_to_spend}TAO, 获得{result['dtao_received']}dTAO, 价格={current_price}")
+            
+            # 更新总投入
+            self.total_tao_invested += tao_to_spend
+            
             return transaction
         else:
             logger.warning(f"买入失败: {result['error']}")
@@ -159,17 +190,18 @@ class TempoSellStrategy:
         if self.mass_sell_triggered:
             return False
         
-        if self.phase != "accumulation":
+        if self.phase != StrategyPhase.ACCUMULATION:
             return False
         
-        # 🔧 核心修正：触发条件基于初始预算，不是AMM池初始储备！
+        # 🔧 核心修正：触发条件基于"总预算"，支持二次增持后的正确触发
         if amm_pool is not None:
             current_tao_reserve = amm_pool.tao_reserves
-            # 正确的触发条件：AMM池TAO储备 >= 初始预算 × 触发倍数
-            target_tao_amount = self.total_budget * self.mass_sell_trigger_multiplier
+            # 使用总预算作为基数（包括初始预算和二次增持预算）
+            total_planned_investment = self.total_budget + self.second_buy_tao_amount
+            target_tao_amount = total_planned_investment * self.mass_sell_trigger_multiplier
             
             if current_tao_reserve >= target_tao_amount:
-                logger.info(f"🎯 大量卖出条件满足: AMM池TAO储备{current_tao_reserve:.4f} >= 目标{target_tao_amount:.4f} (初始预算{self.total_budget:.4f} × {self.mass_sell_trigger_multiplier})")
+                logger.info(f"🎯 大量卖出条件满足: AMM池TAO储备{current_tao_reserve:.4f} >= 目标{target_tao_amount:.4f} (总计划投入{total_planned_investment:.4f} × {self.mass_sell_trigger_multiplier})")
                 return True
             else:
                 logger.debug(f"📊 AMM池TAO监控: 当前{current_tao_reserve:.4f} / 目标{target_tao_amount:.4f} ({current_tao_reserve/target_tao_amount*100:.1f}%)")
@@ -263,7 +295,7 @@ class TempoSellStrategy:
         
         # 更新策略状态（只有在有成功交易时）
         self.mass_sell_triggered = True
-        self.phase = "regular_sell"
+        self.phase = StrategyPhase.REGULAR_SELL
         
         # 如果还有剩余需要卖出的dTAO，安排到下一个区块继续
         remaining_to_sell = total_dtao_to_sell - total_dtao_sold
@@ -307,7 +339,7 @@ class TempoSellStrategy:
         self.current_dtao_balance += amount
         
         # 🔧 简化版：在regular_sell阶段，立即安排在下一个区块卖出（最小延迟）
-        if self.phase == "regular_sell" and amount > 0:
+        if self.phase == StrategyPhase.REGULAR_SELL and amount > 0:
             # 按照源码逻辑，dTAO奖励在Tempo结束时立即分配
             # 我们在获得奖励后的很短时间内（比如2个区块后）进行卖出
             sell_block = current_block + self.sell_delay_blocks
@@ -338,13 +370,16 @@ class TempoSellStrategy:
         logger.info(f"🎉 立即获得dTAO奖励: {amount:.2f} dTAO (Tempo {tempo}, 区块 {current_block})")
         
         # 在regular_sell阶段，标记为可立即卖出
-        if self.phase == "regular_sell":
-            # 最小延迟就是下一个区块
-            sell_block = current_block + 1
-            if sell_block not in self.pending_sells:
-                self.pending_sells[sell_block] = Decimal("0")
-            self.pending_sells[sell_block] += amount
-            logger.info(f"📝 安排立即卖出: {amount:.2f} dTAO 将在区块 {sell_block} 卖出")
+        if self.phase == StrategyPhase.REGULAR_SELL:
+            # 🔧 修正：不仅卖出新获得的奖励，还要检查是否有超过保留数量的dTAO需要卖出
+            excess_dtao = max(Decimal("0"), self.current_dtao_balance - self.reserve_dtao)
+            if excess_dtao > 0:
+                # 最小延迟就是下一个区块
+                sell_block = current_block + 1
+                if sell_block not in self.pending_sells:
+                    self.pending_sells[sell_block] = Decimal("0")
+                self.pending_sells[sell_block] += excess_dtao
+                logger.info(f"📝 安排卖出超额dTAO: {excess_dtao:.2f} dTAO 将在区块 {sell_block} 卖出 (保留:{self.reserve_dtao})")
     
     def execute_pending_sells(self,
                             current_block: int,
@@ -550,19 +585,120 @@ class TempoSellStrategy:
             if mass_sell_transaction:
                 transactions.append(mass_sell_transaction)
                 self.mass_sell_triggered = True  # 确保只触发一次
-                self.phase = "regular_sell" # 转换到常规卖出阶段
+                self.phase = StrategyPhase.REGULAR_SELL # 使用枚举
         
+        # 3b. 检查并执行二次增持 (可以在任何阶段执行)
+        second_buy_transaction = self.execute_second_buy(current_block, amm_pool)
+        if second_buy_transaction:
+            transactions.append(second_buy_transaction)
+
         # 4. 在积累阶段检查并执行买入
-        if self.phase == "accumulation":
+        if self.phase == StrategyPhase.ACCUMULATION: # 使用枚举
             buy_transaction = self.execute_buy(current_price, current_block, amm_pool)
             if buy_transaction:
                 transactions.append(buy_transaction)
+        
+        # 4b. 🔧 新增：在regular_sell阶段定期检查是否有超额dTAO需要卖出
+        elif self.phase == StrategyPhase.REGULAR_SELL:
+            self._check_and_schedule_excess_dtao_sale(current_block)
         
         # 5. 追踪TAO注入量（可选的分析数据）
         self.track_tao_injection(tao_injected)
         
         return transactions
     
+    def _check_and_schedule_excess_dtao_sale(self, current_block: int) -> None:
+        """
+        🔧 新增：检查并安排超额dTAO的卖出
+        在regular_sell阶段定期执行，确保不会累积过多dTAO
+        
+        Args:
+            current_block: 当前区块号
+        """
+        excess_dtao = max(Decimal("0"), self.current_dtao_balance - self.reserve_dtao)
+        
+        # 只有超过一定数量才值得卖出（避免频繁小额交易）
+        min_sell_threshold = Decimal("10")  
+        if excess_dtao >= min_sell_threshold:
+            # 检查是否已经有pending的卖出订单
+            next_few_blocks = [current_block + i for i in range(1, 4)]  # 检查未来3个区块
+            pending_amount = sum(self.pending_sells.get(block, Decimal("0")) for block in next_few_blocks)
+            
+            # 如果pending的数量不足以处理所有超额dTAO，添加更多
+            if pending_amount < excess_dtao:
+                additional_to_sell = excess_dtao - pending_amount
+                sell_block = current_block + 1
+                
+                if sell_block not in self.pending_sells:
+                    self.pending_sells[sell_block] = Decimal("0")
+                self.pending_sells[sell_block] += additional_to_sell
+                
+                logger.debug(f"🔄 安排卖出额外超额dTAO: {additional_to_sell:.2f} dTAO 在区块 {sell_block}")
+
+    def execute_second_buy(self, current_block: int, amm_pool):
+        """
+        执行二次增持操作 - 🔧 修正：遵循买入阈值和步长规则
+        """
+        if self.second_buy_done or self.second_buy_tao_amount <= 0:
+            return None
+
+        # 检查是否到达二次增持的时间点
+        initial_buy_start_block = self.immunity_period + 1 
+        if current_block < initial_buy_start_block + self.second_buy_delay_blocks:
+            return None
+        
+        # 🔧 新增：检查当前价格是否满足买入条件（与普通买入相同的逻辑）
+        current_price = amm_pool.get_spot_price()
+        if current_price >= self.buy_threshold_price:
+            return None  # 价格太高，不买入
+        
+        # 🔧 新增：检查是否还有二次增持预算剩余
+        if not hasattr(self, 'second_buy_remaining'):
+            self.second_buy_remaining = self.second_buy_tao_amount
+        
+        if self.second_buy_remaining <= 0:
+            self.second_buy_done = True
+            return None
+        
+        # 🔧 修正：按步长买入，而不是一次性买入全部
+        step_size = min(self.buy_step_size, self.second_buy_remaining, self.current_tao_balance)
+        
+        if step_size <= 0:
+            return None
+
+        logger.info(f"📈 二次增持买入: 区块{current_block}, 价格{current_price:.4f}, 买入{step_size} TAO (剩余预算: {self.second_buy_remaining})")
+        result = amm_pool.swap_tao_for_dtao(step_size, slippage_tolerance=Decimal("0.5"))
+
+        if result["success"]:
+            self.current_tao_balance -= step_size
+            self.current_dtao_balance += result["dtao_received"]
+            self.total_tao_invested += step_size  # 更新总投入
+            self.second_buy_remaining -= step_size  # 减少剩余预算
+            
+            # 记录交易
+            transaction = {
+                "block": current_block,
+                "type": "second_buy",
+                "tao_spent": step_size,
+                "dtao_received": result["dtao_received"],
+                "price": current_price,
+                "slippage": result["slippage"],
+                "tao_balance": self.current_tao_balance,
+                "dtao_balance": self.current_dtao_balance,
+                "second_buy_remaining": self.second_buy_remaining
+            }
+            self.transaction_log.append(transaction)
+            
+            # 检查是否完成所有二次增持
+            if self.second_buy_remaining <= Decimal("0.01"):  # 允许小数精度误差
+                self.second_buy_done = True
+                logger.info(f"🎉 二次增持完成! 总计投入: {self.second_buy_tao_amount}")
+            
+            return transaction
+        else:
+            logger.warning(f"二次增持买入失败: {result['error']}")
+            return None
+
     def get_portfolio_stats(self, current_market_price: Decimal = None) -> Dict[str, Any]:
         """
         获取资产组合统计信息
@@ -579,14 +715,17 @@ class TempoSellStrategy:
             current_market_price = self.buy_threshold_price
             logger.warning("⚠️ 未提供当前市场价格，使用买入阈值作为保守估计")
         
-        # 🔧 正确的总资产价值计算
+        # 🔧 修正ROI计算：应该基于实际总投资（包括二次增持）
+        actual_total_investment = self.total_budget + self.second_buy_tao_amount
         total_asset_value = self.current_tao_balance + (self.current_dtao_balance * current_market_price)
-        roi = ((total_asset_value - self.total_budget) / self.total_budget * 100) if self.total_budget > 0 else Decimal("0")
+        roi = ((total_asset_value - actual_total_investment) / actual_total_investment * 100) if actual_total_investment > 0 else Decimal("0")
         
         return {
             "current_tao_balance": self.current_tao_balance,
             "current_dtao_balance": self.current_dtao_balance,
             "total_budget": self.total_budget,
+            "second_buy_amount": self.second_buy_tao_amount,  # 新增：二次增持金额
+            "actual_total_investment": actual_total_investment,  # 新增：实际总投资
             "available_budget": self.available_budget,
             "total_dtao_bought": self.total_dtao_bought,
             "total_dtao_sold": self.total_dtao_sold,
@@ -595,7 +734,7 @@ class TempoSellStrategy:
             "net_tao_flow": self.total_tao_received - self.total_tao_spent,
             "total_asset_value": total_asset_value,
             "roi_percentage": roi,
-            "strategy_phase": self.phase,
+            "strategy_phase": self.phase.value,
             "mass_sell_triggered": self.mass_sell_triggered,
             "pending_sells_count": len(self.pending_sells),
             "transaction_count": len(self.transaction_log),
@@ -636,7 +775,8 @@ class TempoSellStrategy:
                 "buy_step_size": self.buy_step_size,
                 "mass_sell_trigger_multiplier": self.mass_sell_trigger_multiplier,  # 🔧 修正：更新参数名
                 "reserve_dtao": self.reserve_dtao,
-            }
+            },
+            "strategy_phase": self.phase.value  # 新增：返回策略阶段的数值
         }
     
     def simulate_mining_rewards(self, current_block: int, tao_injected: Decimal) -> Decimal:
