@@ -34,26 +34,29 @@ class TempoSellStrategy:
         Args:
             config: 策略配置参数
         """
+        # 获取参数：优先从params子配置读取，然后从顶层读取
+        params = config.get("params", config)
+        
         # 基础配置
-        self.total_budget = Decimal(str(config.get("total_budget_tao", "1000")))
-        self.registration_cost = Decimal(str(config.get("registration_cost_tao", "300")))
+        self.total_budget = Decimal(str(params.get("total_budget_tao", "1000")))
+        self.registration_cost = Decimal(str(params.get("registration_cost_tao", "300")))
         
         # 二次增持参数 (需要在计算可用预算前确定)
-        self.second_buy_delay_blocks = int(config.get("second_buy_delay_blocks", 7200 * 30)) # 默认30天后
-        self.second_buy_tao_amount = Decimal(str(config.get("second_buy_tao_amount", "0"))) # 默认不进行二次增持
+        self.second_buy_delay_blocks = int(params.get("second_buy_delay_blocks", 7200 * 30)) # 默认30天后
+        self.second_buy_tao_amount = Decimal(str(params.get("second_buy_tao_amount", "0"))) # 默认不进行二次增持
         
         # 🔧 修正：总可用资金 = 初始预算 + 二次增持预算 - 注册成本
         total_planned_budget = self.total_budget + self.second_buy_tao_amount
         self.available_budget = total_planned_budget - self.registration_cost
         
         # 买入配置
-        self.buy_threshold_price = Decimal(str(config.get("buy_threshold_price", "0.3")))
-        self.buy_step_size = Decimal(str(config.get("buy_step_size_tao", "0.5")))
+        self.buy_threshold_price = Decimal(str(params.get("buy_threshold_price", "0.3")))
+        self.buy_step_size = Decimal(str(params.get("buy_step_size_tao", "0.5")))
         
         # 卖出配置
-        self.mass_sell_trigger_multiplier = Decimal(str(config.get("sell_trigger_multiplier", "2.0")))
-        self.reserve_dtao = Decimal(str(config.get("reserve_dtao", "5000")))
-        self.sell_delay_blocks = int(config.get("sell_delay_blocks", 2))
+        self.mass_sell_trigger_multiplier = Decimal(str(params.get("sell_trigger_multiplier", "2.0")))
+        self.reserve_dtao = Decimal(str(params.get("reserve_dtao", "5000")))
+        self.sell_delay_blocks = int(params.get("sell_delay_blocks", 2))
         self.immunity_period = int(config.get("immunity_period", 7200))
         
         # 策略状态
@@ -249,10 +252,10 @@ class TempoSellStrategy:
         """
         判断是否应该执行大量卖出
         
-        🔧 修正核心逻辑：监控AMM池中TAO储备量，当达到初始预算的指定倍数时触发
+        🔧 修正核心逻辑：基于用户实际投入TAO金额，当达到目标投资额时触发
         
         Args:
-            amm_pool: AMM池实例，用于获取当前TAO储备
+            amm_pool: AMM池实例（未使用，保留兼容性）
             
         Returns:
             是否应该大量卖出
@@ -263,18 +266,17 @@ class TempoSellStrategy:
         if self.phase != StrategyPhase.ACCUMULATION:
             return False
         
-        # 🔧 核心修正：触发条件基于"总预算"，支持二次增持后的正确触发
-        if amm_pool is not None:
-            current_tao_reserve = amm_pool.tao_reserves
-            # 使用总预算作为基数（包括初始预算和二次增持预算）
-            total_planned_investment = self.total_budget + self.second_buy_tao_amount
-            target_tao_amount = total_planned_investment * self.mass_sell_trigger_multiplier
-            
-            if current_tao_reserve >= target_tao_amount:
-                logger.info(f"🎯 大量卖出条件满足: AMM池TAO储备{current_tao_reserve:.4f} >= 目标{target_tao_amount:.4f} (总计划投入{total_planned_investment:.4f} × {self.mass_sell_trigger_multiplier})")
-                return True
-            else:
-                logger.debug(f"📊 AMM池TAO监控: 当前{current_tao_reserve:.4f} / 目标{target_tao_amount:.4f} ({current_tao_reserve/target_tao_amount*100:.1f}%)")
+        # 🔧 核心修正：触发条件基于用户的实际TAO投入金额，而不是AMM池储备
+        # 使用总预算作为基数（包括初始预算和二次增持预算）
+        total_planned_investment = self.total_budget + self.second_buy_tao_amount
+        target_investment_amount = total_planned_investment * self.mass_sell_trigger_multiplier
+        
+        # 检查用户实际投入的TAO是否达到目标
+        if self.total_tao_invested >= target_investment_amount:
+            logger.info(f"🎯 大量卖出条件满足: 用户投入{self.total_tao_invested:.4f} >= 目标{target_investment_amount:.4f} (总计划投入{total_planned_investment:.4f} × {self.mass_sell_trigger_multiplier})")
+            return True
+        else:
+            logger.debug(f"📊 投资进度监控: 当前投入{self.total_tao_invested:.4f} / 目标{target_investment_amount:.4f} ({self.total_tao_invested/target_investment_amount*100:.1f}%)")
         
         return False
     
