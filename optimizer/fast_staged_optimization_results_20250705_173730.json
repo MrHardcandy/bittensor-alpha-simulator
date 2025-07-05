@@ -1,0 +1,1691 @@
+{
+  "optimization_summary": {
+    "total_tests": 39,
+    "total_time_seconds": 40.20987510681152,
+    "optimal_parameters": {
+      "buy_threshold_price": 0.2,
+      "buy_step_size_tao": 0.2,
+      "sell_trigger_multiplier": 1.2,
+      "min_hold_days": 1
+    },
+    "final_roi": -100.0,
+    "payback_days": 999
+  },
+  "stage_results": {
+    "stage1": {
+      "results": [
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 0.2
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.4",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 0.4
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.6",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 0.6
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.8",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 0.8
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "1.0",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 1.0
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "1.2",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 1.2
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "1.4",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 1.4
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "1.6",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 1.6
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "1.8",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 1.8
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "2.0",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_threshold_price": 2.0
+        }
+      ],
+      "optimal": {
+        "roi_3d": -100.0,
+        "final_value": 0,
+        "total_investment": 1000,
+        "payback_days": 999,
+        "max_drawdown": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "config": {
+          "config_version": "2.0",
+          "simulation": {
+            "days": 3,
+            "blocks_per_day": 7200,
+            "tempo_blocks": 360,
+            "tao_per_block": "1.0"
+          },
+          "market": {
+            "other_subnets_avg_price": "1.4"
+          },
+          "subnet": {
+            "initial_dtao": "1000000.0",
+            "initial_tao": "100000.0",
+            "immunity_blocks": 7200,
+            "moving_alpha": "0.1526"
+          },
+          "strategy": {
+            "name": "TempoSellStrategy",
+            "params": {
+              "initial_investment_tao": "1000",
+              "sell_trigger_multiple": "2.0",
+              "buy_threshold": "0.2",
+              "buy_step_size_tao": "0.5",
+              "enable_selling": false,
+              "min_hold_days": 14
+            }
+          }
+        },
+        "buy_threshold_price": 0.2
+      },
+      "optimal_buy_threshold": 0.2
+    },
+    "stage2": {
+      "results": [
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.2
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.3",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.3
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.4",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.4
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.5",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.5
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.6",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.6
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.7",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.7
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.8",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.8
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.9",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 0.9
+        },
+        {
+          "roi_3d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 3,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "1.0",
+                "enable_selling": false,
+                "min_hold_days": 14
+              }
+            }
+          },
+          "buy_step_size_tao": 1.0
+        }
+      ],
+      "optimal": {
+        "roi_3d": -100.0,
+        "final_value": 0,
+        "total_investment": 1000,
+        "payback_days": 999,
+        "max_drawdown": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "config": {
+          "config_version": "2.0",
+          "simulation": {
+            "days": 3,
+            "blocks_per_day": 7200,
+            "tempo_blocks": 360,
+            "tao_per_block": "1.0"
+          },
+          "market": {
+            "other_subnets_avg_price": "1.4"
+          },
+          "subnet": {
+            "initial_dtao": "1000000.0",
+            "initial_tao": "100000.0",
+            "immunity_blocks": 7200,
+            "moving_alpha": "0.1526"
+          },
+          "strategy": {
+            "name": "TempoSellStrategy",
+            "params": {
+              "initial_investment_tao": "1000",
+              "sell_trigger_multiple": "2.0",
+              "buy_threshold": "0.2",
+              "buy_step_size_tao": "0.2",
+              "enable_selling": false,
+              "min_hold_days": 14
+            }
+          }
+        },
+        "buy_step_size_tao": 0.2
+      },
+      "optimal_buy_step": 0.2
+    },
+    "stage3": {
+      "results": [
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.2",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 1
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 1
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.2",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 2
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 2
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.2",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 3
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 3
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.2",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 4
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 4
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 1
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 1
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 2
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 2
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 3
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 3
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "1.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 4
+              }
+            }
+          },
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 4
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 1
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 1
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 2
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 2
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 3
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 3
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 4
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 4
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 1
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 1
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 2
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 2
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 3
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 3
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "2.5",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 4
+              }
+            }
+          },
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 4
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "3.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 1
+              }
+            }
+          },
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 1
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "3.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 2
+              }
+            }
+          },
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 2
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "3.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 3
+              }
+            }
+          },
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 3
+        },
+        {
+          "roi_5d": -100.0,
+          "final_value": 0,
+          "total_investment": 1000,
+          "payback_days": 999,
+          "max_drawdown": 0,
+          "win_rate": 0,
+          "total_trades": 0,
+          "config": {
+            "config_version": "2.0",
+            "simulation": {
+              "days": 5,
+              "blocks_per_day": 7200,
+              "tempo_blocks": 360,
+              "tao_per_block": "1.0"
+            },
+            "market": {
+              "other_subnets_avg_price": "1.4"
+            },
+            "subnet": {
+              "initial_dtao": "1000000.0",
+              "initial_tao": "100000.0",
+              "immunity_blocks": 7200,
+              "moving_alpha": "0.1526"
+            },
+            "strategy": {
+              "name": "TempoSellStrategy",
+              "params": {
+                "initial_investment_tao": "1000",
+                "sell_trigger_multiple": "3.0",
+                "buy_threshold": "0.2",
+                "buy_step_size_tao": "0.2",
+                "enable_selling": true,
+                "min_hold_days": 4
+              }
+            }
+          },
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 4
+        }
+      ],
+      "optimal": {
+        "roi_5d": -100.0,
+        "final_value": 0,
+        "total_investment": 1000,
+        "payback_days": 999,
+        "max_drawdown": 0,
+        "win_rate": 0,
+        "total_trades": 0,
+        "config": {
+          "config_version": "2.0",
+          "simulation": {
+            "days": 5,
+            "blocks_per_day": 7200,
+            "tempo_blocks": 360,
+            "tao_per_block": "1.0"
+          },
+          "market": {
+            "other_subnets_avg_price": "1.4"
+          },
+          "subnet": {
+            "initial_dtao": "1000000.0",
+            "initial_tao": "100000.0",
+            "immunity_blocks": 7200,
+            "moving_alpha": "0.1526"
+          },
+          "strategy": {
+            "name": "TempoSellStrategy",
+            "params": {
+              "initial_investment_tao": "1000",
+              "sell_trigger_multiple": "1.2",
+              "buy_threshold": "0.2",
+              "buy_step_size_tao": "0.2",
+              "enable_selling": true,
+              "min_hold_days": 1
+            }
+          }
+        },
+        "sell_trigger_multiplier": 1.2,
+        "min_hold_days": 1
+      },
+      "optimal_sell_multiplier": 1.2,
+      "optimal_min_hold_days": 1
+    }
+  }
+}

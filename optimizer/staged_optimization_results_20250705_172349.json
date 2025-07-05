@@ -1,0 +1,431 @@
+{
+  "optimization_summary": {
+    "total_tests": 39,
+    "total_time_seconds": 0.008154869079589844,
+    "optimal_parameters": {
+      "buy_threshold_price": 0.2,
+      "buy_step_size_tao": 0.2,
+      "sell_trigger_multiplier": 1.2,
+      "min_hold_days": 7
+    },
+    "final_roi": -100,
+    "payback_days": 999
+  },
+  "stage_results": {
+    "stage1": {
+      "results": [
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 0.2
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 0.4
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 0.6
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 0.8
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 1.0
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 1.2
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 1.4
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 1.6
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 1.8
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_threshold_price": 2.0
+        }
+      ],
+      "optimal": {
+        "roi_30d": -100,
+        "roi_60d": -100,
+        "final_value": 0,
+        "total_investment": 0,
+        "payback_days": 999,
+        "error": "'simulation'",
+        "buy_threshold_price": 0.2
+      },
+      "optimal_buy_threshold": 0.2
+    },
+    "stage2": {
+      "results": [
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.2
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.3
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.4
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.5
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.6
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.7
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.8
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 0.9
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "buy_step_size_tao": 1.0
+        }
+      ],
+      "optimal": {
+        "roi_30d": -100,
+        "roi_60d": -100,
+        "final_value": 0,
+        "total_investment": 0,
+        "payback_days": 999,
+        "error": "'simulation'",
+        "buy_step_size_tao": 0.2
+      },
+      "optimal_buy_step": 0.2
+    },
+    "stage3": {
+      "results": [
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 7
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 14
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 21
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.2,
+          "min_hold_days": 30
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 7
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 14
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 21
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 1.5,
+          "min_hold_days": 30
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 7
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 14
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 21
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.0,
+          "min_hold_days": 30
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 7
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 14
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 21
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 2.5,
+          "min_hold_days": 30
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 7
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 14
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 21
+        },
+        {
+          "roi_30d": -100,
+          "roi_60d": -100,
+          "final_value": 0,
+          "total_investment": 0,
+          "payback_days": 999,
+          "error": "'simulation'",
+          "sell_trigger_multiplier": 3.0,
+          "min_hold_days": 30
+        }
+      ],
+      "optimal": {
+        "roi_30d": -100,
+        "roi_60d": -100,
+        "final_value": 0,
+        "total_investment": 0,
+        "payback_days": 999,
+        "error": "'simulation'",
+        "sell_trigger_multiplier": 1.2,
+        "min_hold_days": 7
+      },
+      "optimal_sell_multiplier": 1.2,
+      "optimal_min_hold_days": 7
+    }
+  }
+}
