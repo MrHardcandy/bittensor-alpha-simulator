@@ -452,7 +452,15 @@ class BittensorSubnetSimulator:
                 "final_asset_value": portfolio_stats["total_asset_value"],
                 "net_tao_flow": portfolio_stats["net_tao_flow"],
                 "transaction_count": portfolio_stats["transaction_count"]
-            }
+            },
+            # 🔧 新增：为优化器提供顶层访问的关键字段
+            "final_portfolio_value_tao": float(portfolio_stats["total_asset_value"]),
+            "total_tao_spent": float(portfolio_stats.get("total_tao_spent", 0)),
+            "total_dtao_purchased": float(portfolio_stats.get("total_dtao_bought", 0)),
+            "total_trades": int(performance_summary.get("trading_stats", {}).get("total_transactions", 0)),
+            "payback_days": portfolio_stats.get("payback_days", 999),
+            "max_drawdown": portfolio_stats.get("max_drawdown", 0),
+            "win_rate": portfolio_stats.get("win_rate", 0)
         }
         
         # 保存摘要到文件

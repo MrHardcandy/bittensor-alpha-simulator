@@ -276,7 +276,9 @@ class TempoSellStrategy:
             logger.info(f"🎯 大量卖出条件满足: 用户投入{self.total_tao_invested:.4f} >= 目标{target_investment_amount:.4f} (总计划投入{total_planned_investment:.4f} × {self.mass_sell_trigger_multiplier})")
             return True
         else:
-            logger.debug(f"📊 投资进度监控: 当前投入{self.total_tao_invested:.4f} / 目标{target_investment_amount:.4f} ({self.total_tao_invested/target_investment_amount*100:.1f}%)")
+            # 🔧 除零错误保护
+            progress_percentage = (self.total_tao_invested/target_investment_amount*100 if target_investment_amount > 0 else 0)
+            logger.debug(f"📊 投资进度监控: 当前投入{self.total_tao_invested:.4f} / 目标{target_investment_amount:.4f} ({progress_percentage:.1f}%)")
         
         return False
     
