@@ -207,8 +207,8 @@ class FastStagedParameterOptimizer:
                     "other_subnets_avg_price": "1.4"
                 },
                 "subnet": {
-                    "initial_dtao": "1000000.0",
-                    "initial_tao": "100000.0",
+                    "initial_dtao": "1.0",
+                    "initial_tao": "1.0",
                     "immunity_blocks": 7200,
                     "moving_alpha": "0.1526"
                 },

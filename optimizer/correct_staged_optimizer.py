@@ -154,43 +154,38 @@ class CorrectStagedParameterOptimizer:
             'total_budget_tao': 1000
         }
         
-        # 测试变量：卖出条件
+        # 测试变量：只测试卖出倍数（去掉最短持有天数测试）
         sell_multipliers = [1.2, 1.5, 2.0, 2.5, 3.0]
-        min_hold_days = [7, 14, 21, 30]
         
         stage3_results = []
         test_count = 0
-        total_tests = len(sell_multipliers) * len(min_hold_days)
+        total_tests = len(sell_multipliers)
         
         for multiplier in sell_multipliers:
-            for hold_days in min_hold_days:
-                test_count += 1
-                test_params = {
-                    **fixed_params,
-                    'sell_trigger_multiplier': multiplier,
-                    'min_hold_days': hold_days
-                }
-                
-                logger.info(f"第三阶段测试 {test_count}/{total_tests}: 卖出倍数 {multiplier}x, 最短持有 {hold_days}天 (60天周期)")
-                result = self._run_single_simulation(test_params)
-                result['sell_trigger_multiplier'] = multiplier
-                result['min_hold_days'] = hold_days
-                stage3_results.append(result)
+            test_count += 1
+            test_params = {
+                **fixed_params,
+                'sell_trigger_multiplier': multiplier
+                # 不设置min_hold_days，让策略按照AMM池TAO倍数来触发大量卖出
+            }
+            
+            logger.info(f"第三阶段测试 {test_count}/{total_tests}: 卖出倍数 {multiplier}x (AMM池TAO达到{multiplier}x总预算时触发卖出)")
+            result = self._run_single_simulation(test_params)
+            result['sell_trigger_multiplier'] = multiplier
+            stage3_results.append(result)
         
         # 找到最优卖出策略
-        best_result = max(stage3_results, key=lambda x: x.get('roi_60d', -999) / (x.get('payback_days', 999) + 1))
+        best_result = max(stage3_results, key=lambda x: x.get('roi_60d', -999))
         self.optimal_params['sell_trigger_multiplier'] = best_result['sell_trigger_multiplier']
-        self.optimal_params['min_hold_days'] = best_result['min_hold_days']
+        # 删除min_hold_days，因为触发条件只基于AMM池TAO倍数
         
         logger.info(f"第三阶段最优卖出倍数: {self.optimal_params['sell_trigger_multiplier']}x")
-        logger.info(f"第三阶段最优持有天数: {self.optimal_params['min_hold_days']}天")
         logger.info(f"第三阶段最优ROI: {best_result.get('roi_60d', 0):.2f}%")
         
         self.results['stage3'] = {
             'results': stage3_results,
             'optimal': best_result,
-            'optimal_sell_multiplier': self.optimal_params['sell_trigger_multiplier'],
-            'optimal_min_hold_days': self.optimal_params['min_hold_days']
+            'optimal_sell_multiplier': self.optimal_params['sell_trigger_multiplier']
         }
         
         return self.results['stage3']
@@ -211,8 +206,8 @@ class CorrectStagedParameterOptimizer:
                     "other_subnets_avg_price": "1.4"
                 },
                 "subnet": {
-                    "initial_dtao": "1000000.0",
-                    "initial_tao": "100000.0",
+                    "initial_dtao": "1.0",
+                    "initial_tao": "1.0",
                     "immunity_blocks": 7200,
                     "moving_alpha": "0.1526"
                 },
@@ -225,7 +220,7 @@ class CorrectStagedParameterOptimizer:
                         "buy_threshold_price": str(params.get('buy_threshold_price', 0.5)),
                         "buy_step_size_tao": str(params.get('buy_step_size_tao', 0.5)),
                         "enable_selling": params.get('enable_selling', False),
-                        "min_hold_days": params.get('min_hold_days', 14),
+                        # min_hold_days参数已移除，只使用AMM池TAO倍数作为触发条件
                         # 添加可能缺失的参数
                         "second_buy_tao_amount": "0"
                     }
@@ -265,6 +260,7 @@ class CorrectStagedParameterOptimizer:
                 'total_trades': result.get('total_trades', 0),
                 'total_tao_spent': result.get('total_tao_spent', 0),
                 'total_dtao_purchased': result.get('total_dtao_purchased', 0),
+                'trigger_2_1x_block': result.get('strategy_performance', {}).get('trigger_2_1x_block', None),
                 'config': config
             }
             
@@ -303,7 +299,7 @@ class CorrectStagedParameterOptimizer:
         # 生成最终报告
         final_report = {
             'optimization_summary': {
-                'total_tests': 10 + 9 + 20,  # 三个阶段的测试总数
+                'total_tests': 10 + 9 + 5,  # 三个阶段的测试总数（第三阶段只测试5个卖出倍数）
                 'total_time_seconds': total_time,
                 'optimal_parameters': self.optimal_params,
                 'final_roi': stage3_result['optimal'].get('roi_60d', 0),

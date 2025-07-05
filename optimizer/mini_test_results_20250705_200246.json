@@ -1,0 +1,146 @@
+{
+  "mini_test_summary": {
+    "total_tests": 3,
+    "total_time_seconds": 1.7722420692443848,
+    "optimal_parameters": {
+      "buy_threshold_price": 1.0,
+      "buy_step_size_tao": 0.5
+    },
+    "best_roi": 297.5314940064218,
+    "best_final_value": 3975.314940064218
+  },
+  "all_results": [
+    {
+      "roi_3d": 188.79692291034834,
+      "final_value": 2887.9692291034835,
+      "total_investment": 1000,
+      "payback_days": 999,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "total_trades": 1204,
+      "total_tao_spent": 586.19845703125,
+      "total_dtao_purchased": 9821.084872454723,
+      "config": {
+        "config_version": "2.0",
+        "simulation": {
+          "days": 3,
+          "blocks_per_day": 7200,
+          "tempo_blocks": 360,
+          "tao_per_block": "1.0"
+        },
+        "market": {
+          "other_subnets_avg_price": "1.4"
+        },
+        "subnet": {
+          "initial_dtao": "1.0",
+          "initial_tao": "1.0",
+          "immunity_blocks": 7200,
+          "moving_alpha": "0.1526"
+        },
+        "strategy": {
+          "name": "TempoSellStrategy",
+          "params": {
+            "total_budget_tao": "1000",
+            "sell_trigger_multiplier": "2.0",
+            "buy_threshold_price": "0.2",
+            "buy_step_size_tao": "0.5",
+            "enable_selling": false,
+            "min_hold_days": 7,
+            "second_buy_tao_amount": "0"
+          }
+        }
+      },
+      "test_id": 1,
+      "buy_threshold_price": 0.2,
+      "buy_step_size_tao": 0.5
+    },
+    {
+      "roi_3d": 273.27177779891707,
+      "final_value": 3732.717777989171,
+      "total_investment": 1000,
+      "payback_days": 999,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "total_trades": 1432,
+      "total_tao_spent": 699.98025390625,
+      "total_dtao_purchased": 8457.211772058728,
+      "config": {
+        "config_version": "2.0",
+        "simulation": {
+          "days": 3,
+          "blocks_per_day": 7200,
+          "tempo_blocks": 360,
+          "tao_per_block": "1.0"
+        },
+        "market": {
+          "other_subnets_avg_price": "1.4"
+        },
+        "subnet": {
+          "initial_dtao": "1.0",
+          "initial_tao": "1.0",
+          "immunity_blocks": 7200,
+          "moving_alpha": "0.1526"
+        },
+        "strategy": {
+          "name": "TempoSellStrategy",
+          "params": {
+            "total_budget_tao": "1000",
+            "sell_trigger_multiplier": "2.0",
+            "buy_threshold_price": "0.5",
+            "buy_step_size_tao": "0.5",
+            "enable_selling": false,
+            "min_hold_days": 7,
+            "second_buy_tao_amount": "0"
+          }
+        }
+      },
+      "test_id": 2,
+      "buy_threshold_price": 0.5,
+      "buy_step_size_tao": 0.5
+    },
+    {
+      "roi_3d": 297.5314940064218,
+      "final_value": 3975.314940064218,
+      "total_investment": 1000,
+      "payback_days": 999,
+      "max_drawdown": 0,
+      "win_rate": 0,
+      "total_trades": 1432,
+      "total_tao_spent": 699.98025390625,
+      "total_dtao_purchased": 7875.551561113805,
+      "config": {
+        "config_version": "2.0",
+        "simulation": {
+          "days": 3,
+          "blocks_per_day": 7200,
+          "tempo_blocks": 360,
+          "tao_per_block": "1.0"
+        },
+        "market": {
+          "other_subnets_avg_price": "1.4"
+        },
+        "subnet": {
+          "initial_dtao": "1.0",
+          "initial_tao": "1.0",
+          "immunity_blocks": 7200,
+          "moving_alpha": "0.1526"
+        },
+        "strategy": {
+          "name": "TempoSellStrategy",
+          "params": {
+            "total_budget_tao": "1000",
+            "sell_trigger_multiplier": "2.0",
+            "buy_threshold_price": "1.0",
+            "buy_step_size_tao": "0.5",
+            "enable_selling": false,
+            "min_hold_days": 7,
+            "second_buy_tao_amount": "0"
+          }
+        }
+      },
+      "test_id": 3,
+      "buy_threshold_price": 1.0,
+      "buy_step_size_tao": 0.5
+    }
+  ]
+}

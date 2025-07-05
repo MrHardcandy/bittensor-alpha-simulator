@@ -82,6 +82,9 @@ class TempoSellStrategy:
         self.total_tao_invested = Decimal("0")
         self.second_buy_done = False # 新增：二次增持完成标志
         
+        # 新增：记录关键时间点
+        self.trigger_2_1x_block = None  # 记录AMM池中TAO达到投入总金额2.1倍的时间点
+        
         # 🔧 更新日志信息，显示完整的预算和触发条件
         total_planned_investment = self.total_budget + self.second_buy_tao_amount
         trigger_condition = total_planned_investment * self.mass_sell_trigger_multiplier
@@ -252,10 +255,10 @@ class TempoSellStrategy:
         """
         判断是否应该执行大量卖出
         
-        🔧 修正核心逻辑：基于用户实际投入TAO金额，当达到目标投资额时触发
+        🔧 修正核心逻辑：基于AMM池中TAO总数达到我们总预算的倍数时触发
         
         Args:
-            amm_pool: AMM池实例（未使用，保留兼容性）
+            amm_pool: AMM池实例，用于获取当前TAO储备量
             
         Returns:
             是否应该大量卖出
@@ -266,19 +269,24 @@ class TempoSellStrategy:
         if self.phase != StrategyPhase.ACCUMULATION:
             return False
         
-        # 🔧 核心修正：触发条件基于用户的实际TAO投入金额，而不是AMM池储备
-        # 使用总预算作为基数（包括初始预算和二次增持预算）
-        total_planned_investment = self.total_budget + self.second_buy_tao_amount
-        target_investment_amount = total_planned_investment * self.mass_sell_trigger_multiplier
+        if amm_pool is None:
+            logger.warning("⚠️ AMM池实例为空，无法检查大量卖出条件")
+            return False
         
-        # 检查用户实际投入的TAO是否达到目标
-        if self.total_tao_invested >= target_investment_amount:
-            logger.info(f"🎯 大量卖出条件满足: 用户投入{self.total_tao_invested:.4f} >= 目标{target_investment_amount:.4f} (总计划投入{total_planned_investment:.4f} × {self.mass_sell_trigger_multiplier})")
+        # 🔧 修正：触发条件基于AMM池中TAO总数达到我们总预算的倍数
+        # 使用总预算（包含注册成本）作为计算基数
+        total_budget = self.total_budget + self.second_buy_tao_amount
+        target_tao_in_pool = total_budget * self.mass_sell_trigger_multiplier
+        current_tao_in_pool = amm_pool.tao_reserves
+        
+        # 检查AMM池中TAO储备是否达到目标倍数
+        if current_tao_in_pool >= target_tao_in_pool:
+            logger.info(f"🎯 大量卖出条件满足: AMM池TAO储备{current_tao_in_pool:.4f} >= 目标{target_tao_in_pool:.4f} (总预算{total_budget:.4f} × {self.mass_sell_trigger_multiplier})")
             return True
         else:
-            # 🔧 除零错误保护
-            progress_percentage = (self.total_tao_invested/target_investment_amount*100 if target_investment_amount > 0 else 0)
-            logger.debug(f"📊 投资进度监控: 当前投入{self.total_tao_invested:.4f} / 目标{target_investment_amount:.4f} ({progress_percentage:.1f}%)")
+            # 进度监控
+            progress_percentage = (current_tao_in_pool/target_tao_in_pool*100 if target_tao_in_pool > 0 else 0)
+            logger.debug(f"📊 AMM池TAO进度: 当前{current_tao_in_pool:.4f} / 目标{target_tao_in_pool:.4f} ({progress_percentage:.1f}%)")
         
         return False
     
@@ -645,6 +653,9 @@ class TempoSellStrategy:
         """
         transactions = []
         
+        # 0. 检查并记录2.1倍触发时间点
+        self._check_2_1x_trigger_point(current_block, amm_pool)
+        
         # 1. 立即将本区块获得的dTAO奖励加入余额
         self.add_dtao_reward_immediate(dtao_rewards, current_block)
 
@@ -680,6 +691,29 @@ class TempoSellStrategy:
         self.track_tao_injection(tao_injected)
         
         return transactions
+    
+    def _check_2_1x_trigger_point(self, current_block: int, amm_pool) -> None:
+        """
+        检查并记录AMM池中TAO达到投入总金额2.1倍的时间点
+        
+        Args:
+            current_block: 当前区块号
+            amm_pool: AMM池对象
+        """
+        if self.trigger_2_1x_block is not None:
+            return  # 已经记录过了
+        
+        # 计算总预算（包括可能的二次增持）
+        total_budget = self.total_budget + self.second_buy_tao_amount
+        target_tao_amount = total_budget * Decimal("2.1")
+        
+        # 获取当前AMM池中的TAO储备量
+        current_tao_reserves = amm_pool.tao_reserves
+        
+        # 检查是否达到2.1倍
+        if current_tao_reserves >= target_tao_amount:
+            self.trigger_2_1x_block = current_block
+            logger.info(f"🎯 2.1倍触发点记录: 区块{current_block}, AMM池TAO储备={current_tao_reserves:.2f}, 目标={target_tao_amount:.2f}")
     
     def _check_and_schedule_excess_dtao_sale(self, current_block: int) -> None:
         """
@@ -812,7 +846,8 @@ class TempoSellStrategy:
             "mass_sell_triggered": self.mass_sell_triggered,
             "pending_sells_count": len(self.pending_sells),
             "transaction_count": len(self.transaction_log),
-            "market_price_used": current_market_price  # 新增：记录使用的市场价格
+            "market_price_used": current_market_price,  # 新增：记录使用的市场价格
+            "trigger_2_1x_block": self.trigger_2_1x_block  # 新增：2.1倍触发时间点
         }
     
     def get_performance_summary(self, current_market_price: Decimal = None) -> Dict[str, Any]:
