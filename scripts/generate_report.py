@@ -311,12 +311,12 @@ class ReportGenerator:
                 {"".join([
                     f"""<tr>
                         <td>{int(row['delay_days'])}</td>
-                        <td>{row['roi_percent']:.2f}</td>
-                        <td>{row['final_amm_tao']:.2f}</td>
-                        <td>{row['final_amm_dtao']:.2f}</td>
-                        <td>{row['final_holding_tao']:.2f}</td>
-                        <td>{row['final_holding_dtao']:.2f}</td>
-                        <td>{int(row['payback_time_days']) if row['payback_time_days'] >= 0 else '未回本'}</td>
+                        <td>{float(row['roi_percent']):.2f}</td>
+                        <td>{float(row['final_amm_tao']):.2f}</td>
+                        <td>{float(row['final_amm_dtao']):.2f}</td>
+                        <td>{float(row['final_holding_tao']):.2f}</td>
+                        <td>{float(row['final_holding_dtao']):.2f}</td>
+                        <td>{int(row['payback_time_days']) if float(row['payback_time_days']) >= 0 else '未回本'}</td>
                     </tr>"""
                     for _, row in scenario_a.iterrows()
                 ])}
@@ -343,12 +343,12 @@ class ReportGenerator:
                 {"".join([
                     f"""<tr>
                         <td>{int(row['delay_days'])}</td>
-                        <td>{row['roi_percent']:.2f}</td>
-                        <td>{row['final_amm_tao']:.2f}</td>
-                        <td>{row['final_amm_dtao']:.2f}</td>
-                        <td>{row['final_holding_tao']:.2f}</td>
-                        <td>{row['final_holding_dtao']:.2f}</td>
-                        <td>{int(row['payback_time_days']) if row['payback_time_days'] >= 0 else '未回本'}</td>
+                        <td>{float(row['roi_percent']):.2f}</td>
+                        <td>{float(row['final_amm_tao']):.2f}</td>
+                        <td>{float(row['final_amm_dtao']):.2f}</td>
+                        <td>{float(row['final_holding_tao']):.2f}</td>
+                        <td>{float(row['final_holding_dtao']):.2f}</td>
+                        <td>{int(row['payback_time_days']) if float(row['payback_time_days']) >= 0 else '未回本'}</td>
                     </tr>"""
                     for _, row in scenario_b.iterrows()
                 ])}
