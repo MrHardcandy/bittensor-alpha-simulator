@@ -1,0 +1,76 @@
+name: 策略延迟数据导出
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_description:
+        description: '测试描述'
+        required: false
+        default: '完整0-30天策略延迟数据导出'
+
+jobs:
+  data-export:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: 运行策略延迟数据导出测试
+      run: |
+        echo "开始完整策略延迟数据导出测试..."
+        echo "测试范围: 0-30天延迟，两个投资场景"
+        python scripts/data_export_test.py
+        echo "测试完成！"
+    
+    - name: 显示生成的文件
+      run: |
+        echo "=== 生成的数据文件 ==="
+        ls -la test_results/
+        echo ""
+        echo "=== 文件大小统计 ==="
+        du -h test_results/*
+        echo ""
+        echo "=== CSV文件预览 ==="
+        echo "场景A文件行数:"
+        wc -l test_results/scenario_A_*.csv
+        echo "场景B文件行数:"
+        wc -l test_results/scenario_B_*.csv
+    
+    - name: 上传测试数据
+      uses: actions/upload-artifact@v4
+      with:
+        name: strategy-delay-data-export-${{ github.run_number }}
+        path: |
+          test_results/*.csv
+          test_results/*.json
+        retention-days: 30
+    
+    - name: 数据导出完成通知
+      run: |
+        echo "🎉 策略延迟数据导出已完成！"
+        echo ""
+        echo "📊 生成的数据："
+        echo "• 场景A: 1000 TAO投资的0-30天延迟测试"
+        echo "• 场景B: 2000 TAO投资的0-30天延迟测试"
+        echo "• 总计: 62次完整模拟测试"
+        echo ""
+        echo "📥 数据文件："
+        echo "• scenario_A_1000TAO_*.csv - 场景A详细数据"
+        echo "• scenario_B_2000TAO_*.csv - 场景B详细数据"
+        echo "• all_results_*.csv - 合并数据"
+        echo "• test_summary_*.json - 测试摘要"
+        echo ""
+        echo "💾 下载方式："
+        echo "在本页面底部的 Artifacts 部分下载ZIP文件"
