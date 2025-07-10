@@ -107,8 +107,8 @@ jobs:
           const issueBody = `
           ## 🎯 策略延迟时间对ROI影响测试报告 #${runNumber}
           
-          **测试时间:** ${new Date().toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})}
-          **触发方式:** ${{ github.event_name === 'workflow_dispatch' ? '手动触发' : '定时执行' }}
+          **测试时间:** ${new Date().toISOString()}
+          **触发方式:** ${{ github.event_name === 'workflow_dispatch' ? 'Manual' : 'Scheduled' }}
           
           ### 📊 测试结果摘要
           
@@ -148,7 +148,7 @@ jobs:
           await github.rest.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: `📊 策略延迟测试报告 #${runNumber} - ${new Date().toLocaleDateString('zh-CN')}`,
+            title: `📊 策略延迟测试报告 #${runNumber} - ${new Date().toISOString().split('T')[0]}`,
             body: issueBody,
             labels: ['automated-test', 'strategy-analysis']
           });
