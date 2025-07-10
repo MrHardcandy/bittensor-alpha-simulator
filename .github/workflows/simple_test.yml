@@ -1,0 +1,83 @@
+name: 简单策略延迟测试
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_description:
+        description: '测试描述'
+        required: false
+        default: '策略延迟时间影响测试'
+
+jobs:
+  strategy-delay-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install matplotlib seaborn
+    
+    - name: 运行策略延迟测试
+      run: |
+        echo "开始策略延迟测试..."
+        python scripts/strategy_delay_test.py
+        echo "测试完成！"
+    
+    - name: 生成HTML报告
+      run: |
+        echo "生成HTML报告..."
+        python scripts/generate_report.py
+        echo "报告生成完成！"
+    
+    - name: 显示测试摘要
+      run: |
+        echo "=== 测试结果摘要 ==="
+        if [ -f test_results/test_summary_*.json ]; then
+          latest_summary=$(ls -t test_results/test_summary_*.json | head -1)
+          echo "摘要文件: $latest_summary"
+          cat "$latest_summary"
+        else
+          echo "未找到测试摘要文件"
+        fi
+        
+        echo ""
+        echo "=== 生成的文件 ==="
+        ls -la test_results/
+    
+    - name: 上传测试结果
+      uses: actions/upload-artifact@v4
+      with:
+        name: strategy-delay-test-results-${{ github.run_number }}
+        path: |
+          test_results/*.csv
+          test_results/*.json
+          test_results/*.html
+        retention-days: 30
+    
+    - name: 部署到GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./test_results
+        destination_dir: strategy-delay-reports
+        keep_files: false
+        commit_message: "更新策略延迟测试报告 - Run #${{ github.run_number }}"
+    
+    - name: 测试完成通知
+      run: |
+        echo "策略延迟时间对ROI影响测试已完成！"
+        echo "结果查看方式:"
+        echo "1. 在线报告: GitHub Pages"
+        echo "2. 原始数据: Actions Artifacts"
