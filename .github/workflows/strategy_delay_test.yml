@@ -101,14 +101,15 @@ jobs:
           }
           
           const runNumber = context.runNumber;
-          const workflowUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
-          const pagesUrl = `${{ github.server_url }}/${{ github.repository }}/blob/gh-pages/strategy-delay-reports/index.html`;
+          const workflowUrl = `${context.payload.repository.html_url}/actions/runs/${context.runId}`;
+          const pagesUrl = `${context.payload.repository.html_url}/blob/gh-pages/strategy-delay-reports/index.html`;
+          const triggerType = context.eventName === 'workflow_dispatch' ? 'Manual' : 'Scheduled';
           
           const issueBody = `
           ## 🎯 策略延迟时间对ROI影响测试报告 #${runNumber}
           
           **测试时间:** ${new Date().toISOString()}
-          **触发方式:** ${{ github.event_name === 'workflow_dispatch' ? 'Manual' : 'Scheduled' }}
+          **触发方式:** ${triggerType}
           
           ### 📊 测试结果摘要
           
