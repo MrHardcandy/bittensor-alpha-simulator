@@ -310,7 +310,7 @@ class FullWebInterface:
             "外部卖出压力 (%)",
             min_value=0.0,
             max_value=100.0,
-            value=50.0, # 提高默认值以便观察
+            value=100.0, # 默认100%，模拟Root验证者等外部参与者全部抛售
             step=1.0,
             help="外部参与者在获得dTAO奖励后，立即将其卖出为TAO的比例。用于模拟市场抛压。"
         )
@@ -339,7 +339,7 @@ class FullWebInterface:
                 "增持金额 (TAO)",
                 min_value=100.0,
                 max_value=10000.0,
-                value=4000.0,  # 🔧 修改默认值为4000 TAO
+                value=1000.0,  # 🔧 修改默认值为1000 TAO
                 step=100.0,
                 help="第二次投入的TAO数量"
             )
