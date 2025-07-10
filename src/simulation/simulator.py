@@ -100,8 +100,9 @@ class BittensorSubnetSimulator:
     def _init_strategy(self):
         """初始化交易策略"""
         strategy_config = self.config["strategy"]
-        # 修正：将豁免期参数传递给策略，以便策略可以做出正确决策
-        strategy_config['immunity_period'] = self.config["subnet"].get("immunity_blocks", 7200)
+        # 修正：使用策略配置中的immunity_period参数，如果没有则使用subnet的immunity_blocks
+        if 'immunity_period' not in strategy_config:
+            strategy_config['immunity_period'] = self.config["subnet"].get("immunity_blocks", 7200)
         self.strategy = TempoSellStrategy(strategy_config)
         logger.info("交易策略初始化完成")
     

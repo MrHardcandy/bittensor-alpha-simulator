@@ -120,13 +120,13 @@ class FullWebInterface:
         
         # 添加移动平均alpha参数
         moving_alpha = st.sidebar.slider(
-            "移动平均α系数",
-            min_value=0.001,
+            "α_base（基准Alpha系数）",
+            min_value=0.0001,
             max_value=0.2,
-            value=0.1526,
-            step=0.001,
-            format="%.3f",
-            help="控制移动价格的收敛速度。较小值(0.001-0.05)适合稳定增长子网，较大值(0.1-0.2)适合快速增长子网"
+            value=0.0003,
+            step=0.0001,
+            format="%.4f",
+            help="EMA公式中的基准Alpha系数：α(t) = α_base × (t / (t + T_half))。链上验证值为0.0003，较小值价格更稳定，较大值收敛更快"
         )
         
         # 显示TAO产生速率的影响说明
@@ -184,6 +184,59 @@ class FullWebInterface:
             max_value=10000.0,
             step=100.0
         )
+        
+        # 添加策略开始时间配置 - 支持天数和区块数双重输入
+        st.sidebar.subheader("⏰ 策略开始时间")
+        
+        # 计算最大值（基于模拟天数）
+        max_blocks = simulation_days * 7200
+        max_days = simulation_days
+        
+        # 创建两列布局
+        col1, col2 = st.sidebar.columns(2)
+        
+        with col1:
+            strategy_start_delay_days = st.number_input(
+                "延迟天数",
+                value=0.0,
+                min_value=0.0,
+                max_value=float(max_days),
+                step=0.1,
+                format="%.1f",
+                help="策略开始买入的延迟天数",
+                key="strategy_delay_days"
+            )
+        
+        with col2:
+            # 根据天数计算对应的区块数
+            calculated_blocks = int(strategy_start_delay_days * 7200)
+            strategy_start_delay_blocks = st.number_input(
+                "延迟区块数",
+                value=max(1, calculated_blocks),
+                min_value=1,
+                max_value=max_blocks,
+                step=1,
+                help="策略开始买入的延迟区块数",
+                key="strategy_delay_blocks"
+            )
+        
+        # 如果用户修改了区块数，反向计算天数
+        if strategy_start_delay_blocks != calculated_blocks and strategy_start_delay_blocks > 0:
+            calculated_days = strategy_start_delay_blocks / 7200
+            if abs(calculated_days - strategy_start_delay_days) > 0.01:  # 避免无限循环
+                st.session_state.strategy_delay_days = calculated_days
+                st.rerun()
+        
+        # 使用区块数作为最终值
+        strategy_start_delay = strategy_start_delay_blocks
+        
+        # 显示换算信息
+        st.sidebar.info(f"""
+        **⏰ 时间换算**  
+        • {strategy_start_delay_days:.1f} 天 = {strategy_start_delay_blocks:,} 区块  
+        • 每天 = 7,200 区块 (每12秒1个区块)  
+        • 最大延迟: {max_days} 天 ({max_blocks:,} 区块)
+        """)
         
         registration_cost = st.sidebar.number_input(
             "子网注册成本 (TAO)",
@@ -327,7 +380,8 @@ class FullWebInterface:
                 "user_reward_share": str(user_reward_share),
                 "external_sell_pressure": str(external_sell_pressure),
                 "second_buy_delay_blocks": second_buy_delay_days * 7200,
-                "second_buy_tao_amount": str(second_buy_tao_amount)
+                "second_buy_tao_amount": str(second_buy_tao_amount),
+                "immunity_period": int(strategy_start_delay)
             }
         }
         
