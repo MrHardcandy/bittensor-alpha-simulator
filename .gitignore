@@ -19,42 +19,93 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual environments
+# Virtual Environment
 venv/
-env/
 ENV/
+env/
+.venv
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Test and Debug Files
+test_*.py
+debug_*.py
+*_test.py
+*_debug.py
+analyze_*.py
+verify_*.py
+diagnose_*.py
+fix_*.py
+minimal_*.py
+quick_*.py
+simple_*.py
+comprehensive_*.py
+interface_*.py
+deployment_*.py
+local_*.py
+custom_*.py
+run_*.py
+start_*.py
+
+# Reports and Documentation
+*_REPORT.md
+*_REPORT_*.md
+*_SUMMARY.md
+*_ANALYSIS.md
+*_GUIDE.md
+*_PLAN.md
+*_NOTES.md
+FIX*.md
+AUDIT*.md
+IMPLEMENTATION*.md
+INTEGRATION*.md
+COMPLETION*.md
+DEPLOYMENT*.md
+EMISSION*.md
+FINAL*.md
+PHASE*.md
+TAO*.md
+V3*.md
+CONFIG*.md
+CODE*.md
+BOT*.md
+
+# Simulation Outputs
+outputs/
+simulations/
+simulation_results_*/
+test_results/
+*.log
+*.json
+!configs/*.json
+!configs/**/*.json
+*.csv
+*.png
+
+# Backup Files
+*.backup*
+*.bak
 
 # Streamlit
 .streamlit/secrets.toml
 
-# Simulation results
-results/
-*.db
-*.csv
-*.html
-
-# Logs
-*.log
-
-# macOS
+# System
 .DS_Store
-
-# Windows
 Thumbs.db
 
-# Virtual environment
-sim_env/
-
-# Python cache
-__pycache__/
-*.pyc
-
-# nohup.out
-nohup.out
+# Temporary
+tmp/
+temp/
+cache/
