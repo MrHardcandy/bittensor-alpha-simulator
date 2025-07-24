@@ -1561,7 +1561,28 @@ if st.session_state.get('simulation_complete', False):
                         )
                     
                     # ROI曲线
-                    initial_investment = float(config.strategy.total_budget_tao) if hasattr(config.strategy, 'total_budget_tao') else 2000
+                    # 尝试从多个来源获取初始投资额
+                    initial_investment = 2000  # 默认值
+                    
+                    # 尝试从summary中获取
+                    if 'strategy_performance' in summary:
+                        strategy_perf = summary['strategy_performance']
+                        if 'initial_budget' in strategy_perf:
+                            initial_investment = float(strategy_perf['initial_budget'])
+                        elif 'total_invested' in strategy_perf:
+                            initial_investment = float(strategy_perf['total_invested'])
+                    
+                    # 尝试从配置文件加载
+                    config_path = os.path.join(output_dir, "config.json")
+                    if os.path.exists(config_path):
+                        try:
+                            with open(config_path, 'r') as f:
+                                config_data = json.load(f)
+                                if 'strategy' in config_data and 'total_budget_tao' in config_data['strategy']:
+                                    initial_investment = float(config_data['strategy']['total_budget_tao'])
+                        except:
+                            pass
+                    
                     df_blocks['roi'] = ((df_blocks['total_value'] - initial_investment) / initial_investment * 100)
                     
                     fig_portfolio.add_trace(
